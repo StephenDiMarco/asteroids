@@ -20,15 +20,13 @@ public class Bullet extends  Circle{
 	private void createVelocity(double rotation, double shipXVel,  double shipYVel){
 		xVelocity = shipXVel+2*strength*Math.sin(rotation*Math.PI/180);
 		yVelocity = shipYVel-2*strength*Math.cos(rotation*Math.PI/180);
-
-
 	}
 	
 	public void move(){
 		position.x += xVelocity;
 		position.y += yVelocity;
 		range--;
-		//Checking if shot is at the end of its ranage.
+		//Checking if shot is at the end of its range.
 		if(range <= 0){
 			depleted = true;
 		}

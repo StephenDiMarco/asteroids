@@ -9,6 +9,7 @@ NOTE: This class is the metaphorical "main method" of your program,
 import java.awt.*;
 import java.util.ArrayList;
 import java.awt.geom.Path2D;
+import static gameContent.ShipAttributes.ModifiableAttributeTypes;
 
 @SuppressWarnings("serial")
 public class Asteroids extends Game{
@@ -20,11 +21,12 @@ public class Asteroids extends Game{
 	static protected int NUM_STARS = 130;
 	static protected boolean updateThread;
 	//Stores game objects
-	private playerShip ship;
+	private Ship ship;
 	protected ArrayList<Bullet> playerBullets;         //Will be used for AIs fire as well
 	private ArrayList <Asteroid> asteroids;
-	private ArrayList <aiShip> ships;
+	private ArrayList <Ship> ships;
 	protected ArrayList<Bullet> aiBullets;         //Will be used for AIs fire as well
+	private UpgradeFactory upgradeFactory;
 	private Star[] stars;
 	private Upgrades upgrade; //Only one can appear on screen at a time
 	//Stats
@@ -56,17 +58,15 @@ public class Asteroids extends Game{
 		 upgrade = null;
 		 //Creating the ship and its bullets
 		 playerBullets = new ArrayList<Bullet>();
-		 this.ship = (playerShip)createShip(SHIP_SHAPE,new Point(SCREEN_WIDTH/2,SCREEN_HEIGHT/2), true);
-		   
-		 //Creating the control interface
-		  this.addKeyListener(ship); 
+		 this.ship = createShip(SHIP_SHAPE,new Point(SCREEN_WIDTH/2,SCREEN_HEIGHT/2), true);
+		 this.upgradeFactory = new UpgradeFactory();
 
 		 //Initialising ArrayList
 		 asteroids = new ArrayList<Asteroid>(); 
 		    
 		 //Creating ship ArrayList
 		 aiBullets = new ArrayList<Bullet>();
-		 ships = new ArrayList<aiShip>();
+		 ships = new ArrayList<Ship>();
 		 this.ship.lives = 3;     
 		  //Creating the stars
 		 stars = new Star[NUM_STARS];
@@ -114,7 +114,7 @@ public class Asteroids extends Game{
 	    	updateScreenOverlay(brush);
 	    	
 	    }
-	     //Collision detction
+	     //Collision detection
 	     collisionCheck();
 	     //Checking Status - level completion, game over
 	     gameStatus();
@@ -199,35 +199,7 @@ public class Asteroids extends Game{
     protected double[] ALIEN_SHIP_SHAPE = {0,0, 2,1, 2,2.5, 5,4, 5,-11, 7,-12, 9,-9, 11,-2, 12,5, 
 				 							8,9, 3,6, -3,6, -8,9, -12,5, -11,-2, -9,-9, -7,-12, -5,-11, -5,4,
 				 							-2,2.5, -2,1};
-	 //Upgrade Arrays
-	 //Strength Upgrade (Missile Shape)
-	 protected double[] STRENGTH_UPGRADE = {0,0, 0,-2, 2,-3, 2,-9, 3,-10, 4,-9, 4,-3, 6,-2, 6,0};
-	 protected int[] STRENGTH_UPGRADE_COLOR = {216,191,216};
-	 
-	 //Stabilzer Upgrade, allows player to slow down faster (Shield Shape)
-	 protected double[] STABLIZE_COEFF_UPGRADE = {0,0, 3,0, 7,-4, 5,-6, -2,-6, -4,-4};
-	 protected int[]  STABLIZE_COEFF_UPGRADE_COLOR = {255,160,122};
-	 //Range Upgrade (Range Upgrade)
-	 protected double[] RANGE_UPGRADE = {0,0, 4,-6, 0,-12, -4,-6};
-	 protected int[] RANGE_UPGRADE_COLOR = {102,205,170};
-	 
-	 //Charge Capacity Upgrade (Box Shape)
-	 protected double[] CHARGE_UPGRADE = {0,0, 5,0, 5,-5, 0,-5};
-	 protected int[] CHARGE_UPGRADE_COLOR = {255,215,0};
-	 
-	 //Increase Health (Large Heart Shape)
-	 protected double[] SHIELDS_INCREASE = {0,0, 5,-5, 4,-8, 2,-8, 0,-7, -2,-8, -4,-8, -5,-5};
-	 protected int[] SHIELDS_INCREASE_COLOR = {164,25,25};
-	 
-	//Restore Health (Small Heart Shape)
-	protected double[] SHIELDS_RESTORE = {0,0, 4,-4, 2,-6, 1,-6, 0,-5, -1,-6, -2,-6, -4,-4};
-	protected int[] SHIELDS_RESTORE_COLOR = {164,25,25};
-	 
-	 //Filling double arrays to randomly select upgrades and their color and their name
-	 protected double[][] UPGRADE_ARRAY = {STRENGTH_UPGRADE,STABLIZE_COEFF_UPGRADE,RANGE_UPGRADE,CHARGE_UPGRADE,SHIELDS_INCREASE,SHIELDS_RESTORE};
-	 protected int[][] COLOR_ARRAY = {STRENGTH_UPGRADE_COLOR,STABLIZE_COEFF_UPGRADE_COLOR,RANGE_UPGRADE_COLOR,CHARGE_UPGRADE_COLOR,SHIELDS_INCREASE_COLOR,SHIELDS_RESTORE_COLOR};
-	 protected String[] UPGRADE_NAME_ARRAY = {"Weapon Strength Upgrade","Stabilizer Upgrade","Weapon Range Upgrade","Weapon Capacity Upgrade","Shield Upgrade","Shield Recharge"};
-	 
+    
 	 private Polygon createObject(double[] shape, Point inPosition){
 		//Drawing object shape, begining
 	    Point[] shapePoints = new Point[(shape.length)/2];
@@ -241,33 +213,24 @@ public class Asteroids extends Game{
 	 
 	 //CreatesShip
 	 @SuppressWarnings("unchecked")
-	private <T extends Ship>T createShip(double[] shape, Point inPosition, boolean player){
+	private Ship createShip(double[] shape, Point inPosition, boolean player){
 		 //Creating ship from generic polygon object
 		 Polygon shipShape = createObject(shape, inPosition);
 		 //Determining whether AI or player ship
 		 if(player){
-			 return ((T)new playerShip(shipShape.getShape(), shipShape.position, TIME_INTERVAL, playerBullets));
+			 return Ship()
+		     PlayerController(shipShape.getShape(), shipShape.position, TIME_INTERVAL, playerBullets));
 		 }else{
 			 //player's ship will be made, sent as target
-			 return (T)new aiShip(shipShape.getShape(), shipShape.position, TIME_INTERVAL, ship, aiBullets, asteroids);
+			 return aiShip(shipShape.getShape(), shipShape.position, TIME_INTERVAL, ship, aiBullets, asteroids);
 		 }
 	 }
 	 //Creating ships
 	 private void createShips(int numShips, double[] shape){
 		 for(int i = 0; i < numShips; i++){
-		 	ships.add((aiShip)createShip(shape, findLocation(), false));
+		 	ships.add((Ship)createShip(shape, findLocation(), false));
 		 }
-	 }
-	 
-	 //Creates Ship
-	 private Upgrades createUpgrade(double[] shape, Point inPosition, int modType, int duration, int[] rbg){
-		 //Creating ship from generic polygon object
-		 Polygon upgrade = createObject(shape, inPosition);
-		 return new Upgrades(upgrade.getShape(), upgrade.position, modType, duration, rbg);
-	 }
-	 
-	 
- 
+	 } 
 	 
 	 private void createStars(){
 		 for(int i = 0; i < NUM_STARS; i++){
@@ -284,9 +247,9 @@ public class Asteroids extends Game{
 		 //Checking if the ship has hit any upgrades
 		 if(upgrade != null){	
 		 	if(ship.intersect(upgrade)){
-				 ship.modWeapons(upgrade.getModType());
+				 ship.upgrade(upgrade.getAttributeType(), upgrade.getModifier());
 				 //Adding overlay of upgrade acquired
-				 screenOverlayMessage = UPGRADE_NAME_ARRAY[upgrade.getModType()];
+				 screenOverlayMessage = upgrade.getName();
 				 screenOverlay = 75;
 				 upgrade = null;
 				 //Bonus points to score
@@ -312,9 +275,9 @@ public class Asteroids extends Game{
 			 //Checking player ship for collision
 			 }else if(ship.contains(aiBullets.get(i).position)) {
 				 //Checking for overshields, then hitting ship and checking for death
-				 if(!ship.OVERSHIELDS){
+				 if(!ship.hasOvershields()){
 					if(ship.hit(aiBullets.get(i).getStrength()) < 0){
-						death();
+						killPlayer();
 					}
 				 }
 				aiBullets.remove(i);
@@ -348,8 +311,8 @@ public class Asteroids extends Game{
 					 if(asteroids.get(i).intersect(ship)){
 						 //Destroying Asteroid
 						 destroyAsteriod(i);
-						 if(!ship.OVERSHIELDS){
-							 death();
+						 if(!ship.hasOvershields()){
+							 killPlayer();
 						 }
 						 break;
 					 }
@@ -457,7 +420,7 @@ public class Asteroids extends Game{
 		    brush.setColor(Color.red);
 		    brush.fill(createShape(ship));
 		    //Adding overshield
-		    if(ship.OVERSHIELDS){
+		    if(ship.hasOvershields()){
 		    	brush.setColor(Color.white);
 		    	brush.draw(createShape(ship));
 		    }
@@ -473,7 +436,7 @@ public class Asteroids extends Game{
 	    private void updateAIShip(Graphics2D brush){
 	    	brush.setColor(Color.magenta);
 	    	for(int i = 0; i < ships.size();i++){
-	    		ships.get(i).updateAI();
+	    		ships.get(i).update();
 	    		ships.get(i).update();
 	 		    brush.fill(createShape(ships.get(i)));		      
 	    	}
@@ -516,7 +479,6 @@ public class Asteroids extends Game{
 	 /***********  Asteroid Variables     **********/
 	 static protected int ASTEROID_DROP_CHANCE = 3;
 	 static protected int ASTEROID_BASE_SCORE = 20;
-	 static protected int ASTEROID_DROP_DURATION = 750;
 	 
 	 private void destroyAsteriod(int index){
 		 score += ASTEROID_BASE_SCORE*asteroids.get(index).getLevel();
@@ -532,10 +494,7 @@ public class Asteroids extends Game{
 		 }else{
 			 //Chance item drop
 			 if(ASTEROID_DROP_CHANCE*Math.random()>ASTEROID_DROP_CHANCE-1){
-				 //Creating upgrade
-				 int upgradeNumber = (int)Math.round(((UPGRADE_ARRAY.length-1)*Math.random()));
-				 //Sending in double[] holding points, the origin, modType, duration
-				 upgrade = createUpgrade(UPGRADE_ARRAY[upgradeNumber],asteroids.get(index).position, upgradeNumber, ASTEROID_DROP_DURATION, COLOR_ARRAY[upgradeNumber] );
+				 upgrade = upgradeFactory.createRandomUpgrade(asteroids.get(index).position);
 			 }
 		 }
 		 //Destroying Asteroid
@@ -543,22 +502,17 @@ public class Asteroids extends Game{
 	 }
 	 
 	 static protected int SHIP_DROP_CHANCE = 2;
-	 static protected int SHIP_BASE_SCORE = 40;
-	 static protected int SHIP_DROP_DURATION = 750;
 	 
-	 //Destroys aiShip
-	 private void destroyShip(int index){
-		 score += SHIP_BASE_SCORE*ships.get(index).STRENGTH;
+	//Destroys aiShip
+	private void destroyShip(int index){
+		score += ships.get(index).score();
 		
 		//Chance item drop
 		if(ASTEROID_DROP_CHANCE*Math.random()>ASTEROID_DROP_CHANCE-1){
-			 //Creating upgrade
-			 int upgradeNumber = (int)Math.round(((UPGRADE_ARRAY.length-1)*Math.random()));
-			 //Sending in double[] holding points, the origin, modType, duration
-			 upgrade = createUpgrade(UPGRADE_ARRAY[upgradeNumber],ships.get(index).position, upgradeNumber, SHIP_DROP_DURATION, COLOR_ARRAY[upgradeNumber] );
-		  }
-		 ships.remove(index);
-	 }
+			 upgrade = upgradeFactory.createRandomUpgrade(ships.get(index).position);
+		}
+		ships.remove(index);
+	}
 	 
 	 //Checks various game state properties and makes appropriate calls
 	 private void gameStatus(){
@@ -599,7 +553,11 @@ public class Asteroids extends Game{
 		 //Level completion bonus
 		 score += level*50;
 		 //Increasing all stats
-		 ship.modWeapons(-1);
+	 	 ship.upgrade(ShipAttributes.ModifiableAttributeTypes.STRENGTH, 0.25f);
+	 	 ship.upgrade(ShipAttributes.ModifiableAttributeTypes.MAX_CHARGE, 2f);
+	 	 ship.upgrade(ShipAttributes.ModifiableAttributeTypes.BULLET_RANGE, 5f);
+	 	 ship.upgrade(ShipAttributes.ModifiableAttributeTypes.STABILIZER, -0.002f);
+	 	 ship.upgrade(ShipAttributes.ModifiableAttributeTypes.CHARGE_RATE, 0.005F);
 		 //Creating new enemies
 		 if(level%5 == 0){
 			 //Setting screen overlay
@@ -617,19 +575,10 @@ public class Asteroids extends Game{
 		 }
 	 }
 	 
-	 private void death(){
-		 //Reducing lives
-		 ship.lives--;
-		 //Refilling Shields
-		 ship.restoreShields();
-		 //Restoring OverShield
-		 ship.restoreOverShields();
-		 //Recharging ships weapons
-		 ship.CHARGE = ship.MAX_CHARGE;
-		 //Resetting player's location/velocity/rotation
+	 private void killPlayer(){
+		 ship.death();
 		 resetPlayer();
 	 }
-
 
   /****************************************     Applet Settings     *****************************************************/
 	 public void init() {

@@ -2,9 +2,9 @@ package gameContent;
 
 import java.util.ArrayList;
 
-public class aiShip extends Ship{
+public class aiShip extends Controller {
 	
-	private playerShip target;               //Uses to target player
+	private PlayerController target;               //Uses to target player
 	private boolean keyLockedOn;             //Flags whether ai is locked onto player.
 	private boolean keyAvoidance;            //Used to notify ship when to flee    
 	private ArrayList<Asteroid> asteroids;   //Used by AI for avoidance
@@ -12,19 +12,10 @@ public class aiShip extends Ship{
 	private double distance;                 //Distance from target
 	private double range;                    //Range of the ships ammunition
 	
-	public aiShip(Point[] inShape, Point inPosition, int timeInterval, playerShip target,  ArrayList<Bullet> bullets, ArrayList<Asteroid> asteroids){
-		super(inShape, inPosition, timeInterval,  bullets);
+	public aiShip(PlayerController target, ArrayList<Asteroid> asteroids){
+		super();
 		this.target = target;
-		this .asteroids = asteroids;
-		//Establishing weapon charge properties
-		MAX_CHARGE = CHARGE = 15;CHARGE_RATE = 0.025;bullets = new ArrayList<Bullet>();
-		//Establishing weapon strength properties
-		STRENGTH = 1;BULLET_RANGE = 125;FIRE_DELAY_TIME = 1; FIRE_DELAY  = 0.0;     //No delay left
-		//Establishing Engine properties
-		ACCELERATION = MAX_ACCELERATION = 0.0105;ANGULAR_VELOCITY = .6;STABILIZE_COEFF = 0.97;
-		//Initialising keys are false
-		keyRotateCW = false; keyRotateCCW = false; keyAccelerate = false; 
-		keyStabilize = false; keyFire = false;
+		this.asteroids = asteroids;
 	}
 	
 	/********************************************************** AI Controls *********************************************/
