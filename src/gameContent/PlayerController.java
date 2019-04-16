@@ -8,10 +8,9 @@ public class PlayerController extends Controller implements KeyListener {
 	//Initial position is left variable to fit the screen size
 	public PlayerController(){
 		super();
-		//Creating the control interface
-		this.addKeyListener(this); 
 	}	
-    	
+	
+	@Override	
 	public void keyPressed(KeyEvent e)
     {
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT)
@@ -35,7 +34,8 @@ public class PlayerController extends Controller implements KeyListener {
 			keyFire = true; 
 		}				
 	}
-    
+	
+	@Override
     public void keyReleased(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT){
 			keyRotateCW = false;
@@ -54,6 +54,7 @@ public class PlayerController extends Controller implements KeyListener {
 		}	
     }
     
+	@Override
     public void keyTyped(KeyEvent e)    {
     	
     }

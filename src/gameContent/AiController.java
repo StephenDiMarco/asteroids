@@ -11,11 +11,16 @@ public class AiController extends Controller {
 	private double SCANNER_RANGE = 100;      //Used as range for collision avoidance
 	private double distance;                 //Distance from target
 	private double range;                    //Range of the ships ammunition
+	private Ship ship;
 	
 	public AiController(Ship target, ArrayList<Asteroid> asteroids){
 		super();
 		this.target = target;
 		this.asteroids = asteroids;
+	}
+	
+	public void setShip(Ship ship) {
+		this.ship = ship;
 	}
 	
 	/********************************************************** AI Controls *********************************************/
@@ -49,7 +54,7 @@ public class AiController extends Controller {
 		/************************************* Setting up angles ******************************************/
 		double angle = getAngle(object);            //Angle of aiShip to object
 		double diff = getDiffAngle(object);         //Difference in angle between the rotation of the ship and the angle calculated above
-		double absDiff = Math.abs(angle-rotation);  //Yet another difference angle.
+		double absDiff = Math.abs(angle-ship.rotation);  //Yet another difference angle.
 		/************************************* Checking Direction ******************************************/
 	    //Targeting Player
 		if(absDiff <= tolerance && chasing){
@@ -104,14 +109,14 @@ public class AiController extends Controller {
 	}	
 	//Calculates the aiShips range
 	private double getRange(){
-		return (getVelocity()+2*STRENGTH)*(timeInterval*BULLET_RANGE);
+		return (ship.getVelocity()+2*ship.getStrength())*(ship.timeInterval*ship.getBulletRange());
 	}
 	//Modifies acceleration booleans and value
 	private void setAcceleration(boolean accelerate, double factor){
 		if(accelerate){
 			keyAccelerate = true;
 			keyStabilize = false;
-			ACCELERATION = MAX_ACCELERATION/factor;
+			ship.setAcceleration(ship.getMaxAcceleration()/factor);
 		}else{
 			keyAccelerate = true;
 			keyStabilize = false;
@@ -141,24 +146,24 @@ public class AiController extends Controller {
 	}
 	
 	private double getDistance(Point point){
-		double deltaX = position.x - point.x;
-		double deltaY = position.y - point.y;
+		double deltaX = ship.position.x - point.x;
+		double deltaY = ship.position.y - point.y;
 		return Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 	}
 	
 	private double getDiffAngle(Point point){
 		double angle = getAngle(point);
-		if(rotation < 0){
-			rotation += 360;
+		if(ship.rotation < 0){
+			ship.rotation += 360;
 		}	
 		
-		double diff = angle - rotation;
+		double diff = angle - ship.rotation;
 		diff = (diff + 180) % 360 - 180;
 		return diff;
 	}
 	
 	private double  getAngle(Point point){
-		double angle = -Math.atan2(point.x - position.x, point.y - position.y);
+		double angle = -Math.atan2(point.x - ship.position.x, point.y - ship.position.y);
 		angle += Math.PI;
 		angle = Math.toDegrees(angle);
 		if(angle < 0){

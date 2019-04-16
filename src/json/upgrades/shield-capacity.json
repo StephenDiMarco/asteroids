@@ -1,43 +1,48 @@
- {
-  "name":"Shield Capacity Upgrade",
+{
+  "color": {
+    "value": -6022887,
+    "frgbvalue": null,
+    "fvalue": null,
+    "falpha": 0.0,
+    "cs": null
+  },
+  "attributeType": "MAX_SHIELDS",
+  "name": "Shield Capacity Upgrade",
   "modifier": 2,
+  "duration": 750,
   "shape": [
-    [
-      0,
-      0
-    ],
-    [
-      5,
-      -5
-    ],
-    [
-      4,
-      -8
-    ],
-    [
-      2,
-      -8
-    ],
-    [
-      0,
-      -7
-    ],
-    [
-      -2,
-      -8
-    ],
-    [
-      -4,
-      -8
-    ],
-    [
-      -5,
-      -5
-    ]
+    {
+      "x": 5.0,
+      "y": 8.0
+    },
+    {
+      "x": 10.0,
+      "y": 3.0
+    },
+    {
+      "x": 9.0,
+      "y": 0.0
+    },
+    {
+      "x": 7.0,
+      "y": 0.0
+    },
+    {
+      "x": 5.0,
+      "y": 1.0
+    },
+    {
+      "x": 3.0,
+      "y": 0.0
+    },
+    {
+      "x": 1.0,
+      "y": 0.0
+    },
+    {
+      "x": 0.0,
+      "y": 3.0
+    }
   ],
-  "rgb": [
-    164,
-    25,
-    25
-  ]
+  "rotation": 0.0
 }

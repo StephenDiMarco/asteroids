@@ -27,9 +27,11 @@ public class Ship extends Polygon {
 		return new Ship(getShape(), position, timeInterval, bullets, controller, attributes);
 	}
 	/************************************** Getter Methods ****************************************/
-	//Waepon's charge getters
+	//Weapon's getters
 	public double getCharge(){return attributes.CHARGE;}
 	public double getMaxCharge(){return attributes.MAX_CHARGE;}
+	public double getStrength(){return attributes.STRENGTH;}
+	public double getBulletRange(){return attributes.BULLET_RANGE;}
 	
     //Shield Charge getters
 	public double getShield(){return attributes.SHIELDS;}
@@ -37,8 +39,13 @@ public class Ship extends Polygon {
 
 	//Velocity Getters
 	public double getVelocity(){	return Math.sqrt(xVelocity*xVelocity+yVelocity*yVelocity);}
+	public double getAcceleration() {return attributes.ACCELERATION;}
+	public void setAcceleration(double value) { attributes.ACCELERATION = value;}
+	public double getMaxAcceleration() {return attributes.MAX_ACCELERATION;}
 	public double getXVel(){	return xVelocity;}
 	public double getYVel(){	return yVelocity;}
+	
+	public Controller getController() { return controller; }
 	
 	public boolean hasOvershields() { return attributes.OVERSHIELDS; }
 	

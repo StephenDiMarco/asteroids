@@ -1,6 +1,4 @@
 package gameContent;
-import static gameContent.ShipAttributes.ModifiableAttributeTypes;
-
 import gameContent.ShipAttributes.ModifiableAttributeTypes;
 
 public class UpgradeFactory {  	 
@@ -18,7 +16,9 @@ public class UpgradeFactory {
 	}
 	
 	public Upgrades createUpgrade(Point position, ModifiableAttributeTypes type) {
-		Polygon shape = Utilities.CreateObject(shape, position, 0);
-		return new Upgrades(shape, position, type, duration, COLOR_ARRAY[upgradeNumber]);
+		Upgrades upgrade = gsonUtility.deserializeFile("upgrades/shield-capacity.json", Upgrades.class);
+		upgrade.position = position;
+		System.out.println(gsonUtility.serialize(upgrade));
+		return upgrade;
 	}
 }

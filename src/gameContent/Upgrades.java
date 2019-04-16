@@ -18,7 +18,11 @@ public class Upgrades extends Polygon{
 		this.name = name;
 		color = new Color(rbg[0],rbg[1],rbg[2]);
 	}
-
+	
+	public void setAttributeType() {
+		attributeType = ModifiableAttributeTypes.MAX_SHIELDS;
+	}
+	
 	public Color getColor() {
 		return color;
 	}
