@@ -4,10 +4,12 @@ import static gameContent.ShipAttributes.ModifiableAttributeTypes;
 import gameContent.ShipAttributes.ModifiableAttributeTypes;
 
 public class UpgradeFactory {  	 
+	
 	private int duration = 750;
-		
-	public UpgradeFactory() {
-		
+	private GsonUtility gsonUtility;
+	
+	public UpgradeFactory(GsonUtility gsonUtility) {
+		this.gsonUtility = gsonUtility;
 	}
 	
 	public Upgrades createRandomUpgrade(Point position) {

@@ -27,6 +27,7 @@ public class Asteroids extends Game{
 	private ArrayList <Ship> ships;
 	protected ArrayList<Bullet> aiBullets;         //Will be used for AIs fire as well
 	private UpgradeFactory upgradeFactory;
+	private GsonUtility gsonUtility;
 	private Star[] stars;
 	private Upgrades upgrade; //Only one can appear on screen at a time
 	//Stats
@@ -59,7 +60,8 @@ public class Asteroids extends Game{
 		 //Creating the ship and its bullets
 		 playerBullets = new ArrayList<Bullet>();
 		 this.ship = createShip(SHIP_SHAPE,new Point(SCREEN_WIDTH/2,SCREEN_HEIGHT/2), true);
-		 this.upgradeFactory = new UpgradeFactory();
+		 this.gsonUtility = new GsonUtility();
+		 this.upgradeFactory = new UpgradeFactory(gsonUtility);
 
 		 //Initialising ArrayList
 		 asteroids = new ArrayList<Asteroid>(); 
