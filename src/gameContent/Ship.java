@@ -46,6 +46,8 @@ public class Ship extends Polygon {
 
 	//Updates ship
 	 public void update(){
+		 controller.update();
+		 
 		 move();
 		 recharge();
 		 //Checking overshield

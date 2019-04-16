@@ -218,11 +218,11 @@ public class Asteroids extends Game{
 		 Polygon shipShape = createObject(shape, inPosition);
 		 //Determining whether AI or player ship
 		 if(player){
-			 return Ship()
-		     PlayerController(shipShape.getShape(), shipShape.position, TIME_INTERVAL, playerBullets));
+			 PlayerController controller = new PlayerController();
+			 return new Ship(shipShape.getShape(), shipShape.position, TIME_INTERVAL, controller, attributes);
 		 }else{
-			 //player's ship will be made, sent as target
-			 return aiShip(shipShape.getShape(), shipShape.position, TIME_INTERVAL, ship, aiBullets, asteroids);
+			 AiController aiController = new AiController(ship, asteroids);
+			 return new Ship(shipShape.getShape(), shipShape.position, TIME_INTERVAL, aiController, attributes);
 		 }
 	 }
 	 //Creating ships

@@ -2,9 +2,9 @@ package gameContent;
 
 import java.util.ArrayList;
 
-public class aiShip extends Controller {
+public class AiController extends Controller {
 	
-	private PlayerController target;               //Uses to target player
+	private Ship target;               //Uses to target player
 	private boolean keyLockedOn;             //Flags whether ai is locked onto player.
 	private boolean keyAvoidance;            //Used to notify ship when to flee    
 	private ArrayList<Asteroid> asteroids;   //Used by AI for avoidance
@@ -12,7 +12,7 @@ public class aiShip extends Controller {
 	private double distance;                 //Distance from target
 	private double range;                    //Range of the ships ammunition
 	
-	public aiShip(PlayerController target, ArrayList<Asteroid> asteroids){
+	public AiController(Ship target, ArrayList<Asteroid> asteroids){
 		super();
 		this.target = target;
 		this.asteroids = asteroids;
@@ -20,20 +20,19 @@ public class aiShip extends Controller {
 	
 	/********************************************************** AI Controls *********************************************/
 	
-	public void updateAI(){
+	public void update(){
 		//Updating ai targeting information
 		distance = getDistance(target.position);
 		range = getRange();
 		//Scanning surrounding pace for threats
 		checkInRange();
-		//If no immeninent threat is near, targeting enemy and pursuing 
+		//If no imminent threat is near, targeting enemy and pursuing 
 		if(!keyAvoidance){
 			//Setting targeting tolerance for ship, and sending true as to attempt to target and not flee
 			findTarget(TARGETTING_TOLERANCE, !keyAvoidance, target.position);
 			//Finds targets angle and distance, rotating ship accordingly
 			checkFireRange();
 		}
-
 	}
 	
 	//Finds target to avoid or chase 

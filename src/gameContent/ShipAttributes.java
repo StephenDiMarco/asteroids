@@ -30,6 +30,7 @@ public class ShipAttributes {
 		OVERSHIELDS = true;
 		ACCELERATION = 0;
 		ANGULAR_VELOCITY = 0;
+		FIRE_DELAY = 0;
 	}
 	
 	public enum ModifiableAttributeTypes {
@@ -62,7 +63,7 @@ public class ShipAttributes {
 		 		STRENGTH += (int)modifier;
         		break;
 		 	case STABILIZER:  
-		 		STABILIZE_COEFF -= modifier;
+		 		STABILIZE_COEFF += modifier;
     			break;
 	   		case BULLET_RANGE:  
 	   			BULLET_RANGE += modifier; 

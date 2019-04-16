@@ -31,4 +31,8 @@ public class Controller {
 		keyStabilize = false; 
 		keyFire = false;
 	}
+	
+	public void update() {
+		
+	}
 }
