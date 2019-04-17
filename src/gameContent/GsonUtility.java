@@ -1,20 +1,25 @@
 package gameContent;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.lang.reflect.Type;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 
 public class GsonUtility {
 	
 	GsonBuilder builder;
+	JsonParser jsonParser;
 	
 	public GsonUtility() {
         builder = new GsonBuilder();
         builder.setPrettyPrinting().serializeNulls();
+        builder.registerTypeAdapter(Color.class, colorDeserializer);
+        builder.registerTypeAdapter(Color.class, colorSerializer);
+        
+        jsonParser = new JsonParser();
 	}
 	
 	public <T> String serialize(T object) {
@@ -38,4 +43,46 @@ public class GsonUtility {
 			return null;
 		}
 	}
+	
+	public JsonObject getJsonObjectFromFile(String filename) {
+		try {
+	        BufferedReader json;
+			json = new BufferedReader(new FileReader("json/" + filename));
+			JsonElement jsonElement = jsonParser.parse(json);
+			
+			if(jsonElement.isJsonObject()) {
+				return jsonElement.getAsJsonObject();
+			}else{
+				throw new FileNotFoundException("Improperly formatted JSON, please encode as a JSON object");
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	JsonDeserializer<Color> colorDeserializer = new JsonDeserializer<Color>() {  
+	    @Override
+	    public Color deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
+	    	JsonObject jsonObject = json.getAsJsonObject();
+
+	        return new Color(
+	                jsonObject.get("r").getAsInt(),
+	                jsonObject.get("g").getAsInt(),
+	                jsonObject.get("b").getAsInt()
+	        );
+	    }
+	};
+
+	JsonSerializer<Color> colorSerializer = new JsonSerializer<Color>() {  
+	    public JsonElement serialize(Color color, Type typeOfSrc, JsonSerializationContext context) {
+	    	JsonObject jsonColor = new JsonObject();
+
+	    	jsonColor.addProperty("r", color.getRed());
+	    	jsonColor.addProperty("g", color.getGreen());
+	    	jsonColor.addProperty("b", color.getBlue());
+	    	
+	        return jsonColor;
+	    }
+	};
 }

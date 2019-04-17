@@ -1,10 +1,8 @@
 {
   "color": {
-    "value": -6022887,
-    "frgbvalue": null,
-    "fvalue": null,
-    "falpha": 0.0,
-    "cs": null
+    "r": 164,
+    "g": 25,
+    "b": 25
   },
   "attributeType": "MAX_SHIELDS",
   "name": "Shield Capacity Upgrade",

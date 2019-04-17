@@ -1,12 +1,12 @@
  {  
   "color": {
     "r": 255,
-    "g": 215,
-    "b": 0
+    "g": 0,
+    "b": 215
   },
-  "attributeType": "MAX_CHARGE",
-  "name":"Weapon Capacity Upgrade",
-  "modifier": 2,
+  "attributeType": "CHARGE_RATE",
+  "name":"Weapon Charge Rate Upgrade",
+  "modifier": 0.25,
   "duration": 750,
   "shape": [
     {

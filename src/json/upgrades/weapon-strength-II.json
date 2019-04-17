@@ -1,13 +1,13 @@
 {
   "color": {
     "r": 216,
-    "g": 191,
+    "g": 220,
     "b": 216
   },
   "attributeType": "STRENGTH",
-  "name":"Weapon Damage Upgrade",
-  "modifier": 0.50,
-  "duration": 750,
+  "name":"Explosive Weapon Damage Upgrade",
+  "modifier": 0.75,
+  "duration": 200,
   "shape": [
     {
       "x": 0,

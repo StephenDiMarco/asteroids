@@ -1,8 +1,24 @@
-[
-  "weapon-strength.json",
-  "stabilizer.json",
-  "weapon-range.json",
-  "charge-capacity.json",
-  "shield-capacity.json",
-  "shield-repair.json"
-]
+{
+  "STRENGTH": [
+      "weapon-strength.json",
+      "weapon-strength-II.json"
+  ],
+  "STABILIZER" :[
+      "stabilizer.json"
+  ],
+  "BULLET_RANGE": [
+      "weapon-range.json"
+  ],
+  "MAX_CHARGE": [
+      "charge-capacity.json"
+  ],
+  "MAX_RATE": [
+      "charge-rate.json"
+  ],
+  "MAX_SHIELDS": [
+      "shield-capacity.json"
+  ],
+  "SHIELDS": [
+      "shield-repair.json"
+  ]
+}
