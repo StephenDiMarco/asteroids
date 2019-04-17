@@ -167,8 +167,6 @@ public class Asteroids extends Game {
             }
             //Creating new Asteroid
             asteroids.add(new Asteroid(tempPoints, inPosition, TIME_INTERVAL, levelAster));
-            //Increasing the enemies counter.
-            System.out.println(i);
         }
 
     }
