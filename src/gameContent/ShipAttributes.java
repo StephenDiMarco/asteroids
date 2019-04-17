@@ -34,24 +34,14 @@ public class ShipAttributes {
 	}
 	
 	public enum ModifiableAttributeTypes {
-		STRENGTH("Weapon Strength"),
-		STABILIZER("Stabilizer"),
-		BULLET_RANGE("Weapon Range"),
-		MAX_CHARGE("Weapon Capacity"),
-		CHARGE_RATE("Weapon Charge Rate"),
-		MAX_SHIELDS("Shield Capacity"), 
-		SHIELDS("Shields");
-
-	    private String name;
-
-	    private ModifiableAttributeTypes(String name) {
-	        this.name = name;
-	    }
-
-	    public String getName() {
-	        return name;
-	    }
-	    	    
+		STRENGTH,
+		STABILIZER,
+		BULLET_RANGE,
+		MAX_CHARGE,
+		CHARGE_RATE,
+		MAX_SHIELDS, 
+		SHIELDS;
+    
 	    public static ModifiableAttributeTypes Random() {
 	    	return ModifiableAttributeTypes.values()[(int)(Math.random() * ModifiableAttributeTypes.values().length)];
 	    }
