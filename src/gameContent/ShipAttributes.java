@@ -40,7 +40,8 @@ public class ShipAttributes {
 		MAX_CHARGE,
 		CHARGE_RATE,
 		MAX_SHIELDS, 
-		SHIELDS;
+		SHIELDS,
+		MAX_ACCELERATION;
     
 	    public static ModifiableAttributeTypes Random() {
 	    	return ModifiableAttributeTypes.values()[(int)(Math.random() * ModifiableAttributeTypes.values().length)];
@@ -48,6 +49,7 @@ public class ShipAttributes {
 	}
 
 	public void modifyAttribute(ModifiableAttributeTypes type, float modifier) {
+		 System.out.println("Upgrading " + type.name()	+ " by " + modifier);
 		 switch(type){
 		 	case STRENGTH:  
 		 		STRENGTH += (int)modifier;
@@ -68,6 +70,9 @@ public class ShipAttributes {
 	     		break;
 	 		case SHIELDS: 
 	 			SHIELDS += modifier; 
+	   			break;
+	 		case MAX_ACCELERATION: 
+	 			MAX_ACCELERATION += modifier; 
 	   			break;
 		 }
 	}

@@ -12,7 +12,7 @@
   "MAX_CHARGE": [
       "charge-capacity.json"
   ],
-  "MAX_RATE": [
+  "CHARGE_RATE": [
       "charge-rate.json"
   ],
   "MAX_SHIELDS": [
