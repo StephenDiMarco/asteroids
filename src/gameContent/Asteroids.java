@@ -221,17 +221,21 @@ public class Asteroids extends Game {
     //CreatesShip
     @SuppressWarnings("unchecked")
     private Ship createShip(double[] shape, Point inPosition, boolean player) {
+    	return createShip(shape, inPosition, player, "ships/sparrow.json");
+    }
+    
+    private Ship createShip(double[] shape, Point inPosition, boolean player, String shipType) {
         //Creating ship from generic polygon object
         Polygon shipShape = createObject(shape, inPosition);
         //Determining whether AI or player ship
         if (player) {
             PlayerController controller = new PlayerController();
-            ShipAttributes attributes = gsonUtility.deserializeFile("ships/sparrow.json", ShipAttributes.class);
+            ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
             return new Ship(shipShape.getShape(), shipShape.position, TIME_INTERVAL, playerBullets, controller, attributes);
         } else {
         	// TODO clean up this awful mess
             AiController aiController = new AiController(ship, asteroids);
-            ShipAttributes attributes = gsonUtility.deserializeFile("ships/falcon.json", ShipAttributes.class);
+            ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
             Ship ship = new Ship(shipShape.getShape(), shipShape.position, TIME_INTERVAL, aiBullets, aiController, attributes);
             AiController shipController = (AiController)ship.getController();
             shipController.setShip(ship);
@@ -239,7 +243,7 @@ public class Asteroids extends Game {
         }
     }
     //Creating ships
-    private void createShips(int numShips, double[] shape) {
+    private void createShips(int numShips, double[] shape, String shipType) {
         for (int i = 0; i < numShips; i++) {
             ships.add((Ship) createShip(shape, findLocation(), false));
         }
@@ -574,7 +578,7 @@ public class Asteroids extends Game {
             //Setting screen overlay
             screenOverlay = 150;
             screenOverlayMessage = "Enemy Space - Level " + level;
-            createShips(BASE_AISHIP_COUNT + level, ALIEN_SHIP_SHAPE);
+            createShips(BASE_AISHIP_COUNT + level, ALIEN_SHIP_SHAPE, "ships/falcon-III.json");
             //Easing difficulty moving forward
             BASE_ASTERIOD_COUNT -= 7;
         } else {
@@ -582,7 +586,8 @@ public class Asteroids extends Game {
             screenOverlay = 150;
             screenOverlayMessage = "Asteroid Belt - Level " + level;
             createAsteroids(BASE_ASTERIOD_COUNT + level, level, null);
-            createShips(level, ALIEN_SHIP_SHAPE);
+            createShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-I.json");
+            createShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-II.json");
         }
     }
 
@@ -595,7 +600,6 @@ public class Asteroids extends Game {
     public void init() {
         setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         buffer = createImage(SCREEN_WIDTH, SCREEN_HEIGHT);
-
     }
 
     public void start() {}
