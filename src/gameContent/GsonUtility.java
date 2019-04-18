@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 import com.google.gson.*;
@@ -38,9 +39,8 @@ public class GsonUtility {
 	        BufferedReader json;
 			json = new BufferedReader(new FileReader("json/" + filename));
 	        return gson.fromJson(json, type); 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return null;
+		} catch (FileNotFoundException | JsonSyntaxException e) {
+		    return null;
 		}
 	}
 	
@@ -56,9 +56,18 @@ public class GsonUtility {
 				throw new FileNotFoundException("Improperly formatted JSON, please encode as a JSON object");
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public <T> boolean deserializationValidator(T object) throws IllegalAccessException {
+	    for (Field f : object.getClass().getDeclaredFields()) {
+			f.setAccessible(true);
+	    	if (f.get(object) == null) {
+	            return false;	
+	    	}
+	    }
+	    return true;            
 	}
 	
 	JsonDeserializer<Color> colorDeserializer = new JsonDeserializer<Color>() {  

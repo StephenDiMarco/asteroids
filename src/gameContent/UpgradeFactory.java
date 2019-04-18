@@ -26,23 +26,30 @@ public class UpgradeFactory {
 			System.out.println("JSON was not formatted correctly");
 			return null;			
 		}else{
-			return createUpgradeFromJson(position, type, filesByAttribute);	
+			if(filesByAttribute.has(type.name())) {
+				return createUpgradeFromJson(position, type, filesByAttribute);	
+			}else {
+				System.out.println("JSON did not contain an element of type " + type.name());
+				return null;
+			}
 		}
 	}
 	
 	private Upgrades createUpgradeFromJson(Point position, ModifiableAttributeTypes type, JsonObject filesByAttributeJson) {
-		if(filesByAttributeJson.has(type.name())) {
-			JsonArray files = filesByAttributeJson.get(type.name()).getAsJsonArray();
-			int fileIndex = (int)(Math.random() * files.size());
-			String file = files.get(fileIndex).getAsString();
-			
-			Upgrades upgrade = gsonUtility.deserializeFile(upgradePath +  file, Upgrades.class);
-			upgrade.position = position;
-			
-			return upgrade;	
+		JsonArray files = filesByAttributeJson.get(type.name()).getAsJsonArray();
+		int fileIndex = (int)(Math.random() * files.size());
+		String file = files.get(fileIndex).getAsString();
+		
+		System.out.println("Type " + type.name() + " file " + file);
+		
+		Upgrades upgrade = gsonUtility.deserializeFile(upgradePath +  file, Upgrades.class);
+		if(upgrade != null) {
+			upgrade.position = position;		
+			return upgrade;		
 		}else {
-			System.out.println("JSON did not contain an element of type " + type.name());
+			System.out.println("JSON deserialization failed");
 			return null;
 		}
 	}
+
 }
