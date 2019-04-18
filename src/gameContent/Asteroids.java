@@ -28,7 +28,7 @@ public class Asteroids extends Game {
     private UpgradeFactory upgradeFactory;
     private GsonUtility gsonUtility;
     private Star[] stars;
-    private Upgrades upgrade; //Only one can appear on screen at a time
+    private ArrayList < Upgrades > upgrades; //Only one can appear on screen at a time
     //Stats
     private int level;
     private int score;
@@ -59,7 +59,7 @@ public class Asteroids extends Game {
         BASE_ASTERIOD_COUNT = 2;
         BASE_AISHIP_COUNT = 3;
         //Resetting upgrade
-        upgrade = null;
+        upgrades = new ArrayList < Upgrades > ();
 
         this.gsonUtility = new GsonUtility();
 
@@ -262,16 +262,18 @@ public class Asteroids extends Game {
     private void collisionCheck() {
         isOutOfBounds(ship);
         //Checking if the ship has hit any upgrades
-        if (upgrade != null) {
-            if (ship.intersect(upgrade)) {
-                ship.upgrade(upgrade.getAttributeType(), upgrade.getModifier());
-                //Adding overlay of upgrade acquired
-                screenOverlayMessage = upgrade.getName();
-                screenOverlay = 75;
-                upgrade = null;
-                //Bonus points to score
-                score += 20;
-            }
+        if (!upgrades.isEmpty()) {
+            for (int index = 0; index < upgrades.size(); index++) {
+                if (ship.intersect(upgrades.get(index))) {
+                    ship.upgrade(upgrades.get(index).getAttributeType(), upgrades.get(index).getModifier());
+                    //Adding overlay of upgrade acquired
+                    screenOverlayMessage = upgrades.get(index).getName();
+                    screenOverlay = 75;
+                    upgrades.remove(index);
+                    //Bonus points to score
+                    score += 20;
+                }            
+            } 
         }
 
         //Checking if bullets are out of bounds or are depleted.
@@ -408,14 +410,18 @@ public class Asteroids extends Game {
     //Makes checks and paints images
     private void updateUpgrade(Graphics2D brush) {
         //Drawing the upgrade
-        if (upgrade != null) {
-            brush.setColor(upgrade.getColor());
-            brush.fill(createShape(upgrade));
-            //Decrementing upgrade time
-            upgrade.decreaseDuration();
-            //Checking if time is depleted
-            if (upgrade.getDuration() <= 0) {
-                upgrade = null;
+        if (!upgrades.isEmpty()) {
+            for (int index = 0; index < upgrades.size(); index++) {
+		        if (upgrades.get(index) != null) {
+		            brush.setColor(upgrades.get(index).getColor());
+		            brush.fill(createShape(upgrades.get(index)));
+		            //Decrementing upgrade time
+		            upgrades.get(index).decreaseDuration();
+		            //Checking if time is depleted
+		            if (upgrades.get(index).getDuration() <= 0) {
+		            	upgrades.remove(index);
+		            }
+		        }
             }
         }
     }
@@ -508,8 +514,8 @@ public class Asteroids extends Game {
             createAsteroids(numAster, asteroids.get(index).getLevel() - 1, asteroids.get(index).position);
         } else {
             //Chance item drop
-            if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 1) {
-                upgrade = upgradeFactory.createRandomUpgrade(asteroids.get(index).position);
+            if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 2) {
+            	addUpgradeToScene(asteroids.get(index).position);
             }
         }
         //Destroying Asteroid
@@ -524,11 +530,20 @@ public class Asteroids extends Game {
 
         //Chance item drop
         if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 1) {
-            upgrade = upgradeFactory.createRandomUpgrade(ships.get(index).position);
+        	addUpgradeToScene(ships.get(index).position);
         }
         ships.remove(index);
     }
-
+    
+    private void addUpgradeToScene(Point position) {
+        Upgrades upgrade = upgradeFactory.createRandomUpgrade(position);
+        if(upgrade != null) {
+            upgrades.add(upgrade);        	
+        }else {
+        	System.out.println("Error generating upgrade.");
+        }
+    }
+    
     //Checks various game state properties and makes appropriate calls
     private void gameStatus() {
         //Checking if level is complete
