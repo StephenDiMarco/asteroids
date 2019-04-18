@@ -13,12 +13,12 @@ import java.awt.geom.Path2D;
 @SuppressWarnings("serial")
 public class Asteroids extends Game {
 
-    static protected int SCREEN_WIDTH = 900;
-    static protected int SCREEN_HEIGHT = 650;
-    static protected int MAX_POINTS = 15; //Max number of points on an asteroid
-    static protected int MIN_DISTANCE = 60; //The minimum distance an asteroid can spawn away from a player
-    static protected int NUM_STARS = 130;
-    static protected boolean updateThread;
+    private int SCREEN_WIDTH;
+    private int SCREEN_HEIGHT;
+    private int MAX_POINTS = 15; //Max number of points on an asteroid
+    private int MIN_DISTANCE = 60; //The minimum distance an asteroid can spawn away from a player
+    private int NUM_STARS = 130;
+    private boolean updateThread;
     //Stores game objects
     private Ship ship;
     protected ArrayList < Bullet > playerBullets; //Will be used for AIs fire as well
@@ -40,10 +40,14 @@ public class Asteroids extends Game {
 
     //Constructor	
     public Asteroids() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        SCREEN_WIDTH = (int)screenSize.getWidth();
+        SCREEN_HEIGHT = (int)screenSize.getHeight();
+        System.out.println("Size:" + SCREEN_WIDTH + "  " + SCREEN_HEIGHT);
+        
         newGame();
         //Setting updateThread to false to begin;
         updateThread = false;
-
     }
     public void newGame() {
         //Submitting score over 0
