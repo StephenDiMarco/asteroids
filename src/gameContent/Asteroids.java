@@ -245,7 +245,7 @@ public class Asteroids extends Game {
     //Creating ships
     private void createShips(int numShips, double[] shape, String shipType) {
         for (int i = 0; i < numShips; i++) {
-            ships.add((Ship) createShip(shape, findLocation(), false));
+            ships.add((Ship) createShip(shape, findLocation(), false, shipType));
         }
     }
 
@@ -602,7 +602,7 @@ public class Asteroids extends Game {
             screenOverlayMessage = "Asteroid Belt - Level " + level;
             createAsteroids(BASE_ASTERIOD_COUNT + level, level, null);
             createShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-I.json");
-            createShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-II.json");
+            createShips(1, ALIEN_SHIP_SHAPE, "ships/falcon-II.json");
         }
     }
 
