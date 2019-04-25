@@ -18,6 +18,9 @@ public abstract class Game extends Applet implements KeyListener{
 	protected int screenOverlay; 		//Keeps track of screenOverlays (and serves as a count down)
 	protected String screenOverlayMessage;
 	protected boolean on = true;
+	private int elsapedTime;
+	protected long lastTimeStamp;
+
 	//Graphics support
 	protected Image buffer;
 	//Time in 1/100 of a second
@@ -39,8 +42,9 @@ public abstract class Game extends Applet implements KeyListener{
     public void update(Graphics brush) {
       paint(buffer.getGraphics());
       brush.drawImage(buffer,0,0,this);
-  		
-      if (on) {sleep(TIME_INTERVAL); repaint();}
+      elsapedTime = (int) (System.currentTimeMillis() - lastTimeStamp);
+      System.out.println(elsapedTime);
+      if (on) {sleep(TIME_INTERVAL-elsapedTime); repaint();}
     }
     
     // 'sleep' is a simple helper function used in 'update'.
