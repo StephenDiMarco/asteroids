@@ -28,8 +28,16 @@ public class Controller {
 		keyRotateCW = false; 
 		keyRotateCCW = false; 
 		keyAccelerate = false; 
-		keyStabilize = false; 
 		keyFire = false;
+		keyStabilize = false; 
+	}
+	
+	protected void resetKeys() {
+		keyRotateCW = false; 
+		keyRotateCCW = false; 
+		keyAccelerate = false; 
+		keyFire = false;
+		keyStabilize = true; 
 	}
 	
 	public void update() {
