@@ -198,30 +198,6 @@ public class Asteroids extends Game {
         return asterShape;
     }
 
-    /***********************************      Object Definitions        ***************************************/
-    //Array of points to be parsed and made into predefined objects
-
-	//Ship array
-    protected double[] ALIEN_SHIP_SHAPE = {0,0, 2,1, 2,2.5, 5,4, 5,-11, 7,-12, 9,-9, 11,-2, 12,5, 
-				 							8,9, 3,6, -3,6, -8,9, -12,5, -11,-2, -9,-9, -7,-12, -5,-11, -5,4,
-				 							-2,2.5, -2,1};
-
-    private Ship createAiShip(double[] shape, Point inPosition, boolean player, String shipType) {
-        Polygon shipShape = Utilities.CreateObject(shape, inPosition, 0);
-        AiController aiController = new AiController(ship, asteroids);
-        ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
-        Ship ship = new Ship(shipShape.getShape(), shipShape.position, aiBullets, aiController, attributes);
-        AiController shipController = (AiController)ship.getController();
-        shipController.setShip(ship);
-        return ship;
-    }
-    //Creating ships
-    private void createAiShips(int numShips, double[] shape, String shipType) {
-        for (int i = 0; i < numShips; i++) {
-            ships.add((Ship) createAiShip(shape, findLocation(), false, shipType));
-        }
-    }
-
     private void createStars() {
         for (int i = 0; i < NUM_STARS; i++) {
             //Randomly placing and sizing stars
@@ -565,7 +541,7 @@ public class Asteroids extends Game {
             //Setting screen overlay
             screenOverlay = 150;
             screenOverlayMessage = "Enemy Space - Level " + level;
-            createAiShips(BASE_AISHIP_COUNT + level, ALIEN_SHIP_SHAPE, "ships/falcon-III.json");
+            createAiShips(BASE_AISHIP_COUNT + level, "ships/falcon-III.json");
             //Easing difficulty moving forward
             BASE_ASTERIOD_COUNT -= 7;
         } else {
@@ -573,11 +549,17 @@ public class Asteroids extends Game {
             screenOverlay = 150;
             screenOverlayMessage = "Asteroid Belt - Level " + level;
             createAsteroids(BASE_ASTERIOD_COUNT + level, level, null);
-            createAiShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-I.json");
-            createAiShips(1, ALIEN_SHIP_SHAPE, "ships/falcon-II.json");
+            createAiShips(level, "ships/falcon-I.json");
+            createAiShips(level-1, "ships/falcon-II.json");
         }
     }
-
+    
+	public void createAiShips(int numShips, String type) {
+        for (int i = 0; i < numShips; i++) {
+            ships.add((Ship) shipFactory.createAiShip(findLocation(), type, ship, asteroids, aiBullets));
+        }
+	}
+	
     private void killPlayer() {
         ship.death();
         resetPlayer();
