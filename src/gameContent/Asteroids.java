@@ -90,6 +90,7 @@ public class Asteroids extends Game {
 
     @Override
     public void paint(Graphics g) {
+    	lastTimeStamp = System.currentTimeMillis();
         //Checking for new game
         if (getNewGame()) {
             //Creating new game
@@ -550,7 +551,7 @@ public class Asteroids extends Game {
             screenOverlayMessage = "Asteroid Belt - Level " + level;
             createAsteroids(BASE_ASTERIOD_COUNT + level, level, null);
             createAiShips(level, "ships/falcon-I.json");
-            createAiShips(level-1, "ships/falcon-II.json");
+            createAiShips(level, "ships/falcon-II.json");
         }
     }
     
