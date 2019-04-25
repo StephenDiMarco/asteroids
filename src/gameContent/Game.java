@@ -21,7 +21,11 @@ public abstract class Game extends Applet implements KeyListener{
 	//Graphics support
 	protected Image buffer;
 	//Time in 1/100 of a second
-	protected int TIME_INTERVAL = 10;
+	private static int TIME_INTERVAL = 10;
+	
+	public static int GetTimeInterval( ) {
+		return  TIME_INTERVAL;
+	}
 	
 	public Game(){
 		//Creating the control interface

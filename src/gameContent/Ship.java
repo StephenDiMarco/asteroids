@@ -14,17 +14,17 @@ public class Ship extends Polygon {
 	protected double timeInterval;
 	
 	/************************************** Constructors ****************************************/
-	public Ship(Point[] inShape, Point inPosition, double timeInterval,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes){
+	public Ship(Point[] inShape, Point inPosition,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes){
 		super(inShape, inPosition, 0);
 		//Setting time interval
-		this.timeInterval = timeInterval/10;
+		timeInterval = Game.GetTimeInterval();
 		this.bullets = bullets;
 		this.controller = controller;
 		this.attributes = attributes;
 	}
 
 	public Ship createCopy(){
-		return new Ship(getShape(), position, timeInterval, bullets, controller, attributes);
+		return new Ship(getShape(), position, bullets, controller, attributes);
 	}
 	/************************************** Getter Methods ****************************************/
 	//Weapon's getters
@@ -86,6 +86,8 @@ public class Ship extends Polygon {
 			 attributes.FIRE_DELAY -= 0.1;
 		 }
 	 }
+	 
+	 
 	 /************************ Shield System Methods **************************/
 	 //Hitting ship and returning value
 	 public double hit(double Strength){
@@ -101,33 +103,43 @@ public class Ship extends Polygon {
 		 attributes.OVERSHIELDS_DURATION = 200;
 	 }
 	 /************************ Engine System Methods **************************/
-	public void setVelocity(double xVelocity, double yVelocity){
+	public void setVelocity(double xVelocity, double yVelocity){ 	 
 		this.xVelocity = xVelocity;
 		this.yVelocity = yVelocity;
 	}
-	 //Moves ship
+
 	 private void move(){
 		 position.x += xVelocity*timeInterval;
 		 position.y += yVelocity*timeInterval;
 	 }
-	 
+
 	 private void accelerate (double acceleration) {
-		 xVelocity += (acceleration * Math.sin(Math.toRadians(rotation)));
-		 yVelocity += (acceleration * -Math.cos(Math.toRadians(rotation)));
+		 double dvx = (acceleration * Math.sin(Math.toRadians(rotation)));
+		 double dvy = (acceleration * -Math.cos(Math.toRadians(rotation)));
+		 xVelocity += dvx;
+		 yVelocity += dvy;
+		 if(getVelocity() > attributes.MAX_VELOCITY ) {
+			 double theta = -Math.atan2(xVelocity, yVelocity);
+			 theta += Math.PI;
+			 theta = Math.toDegrees(theta);
+			 xVelocity = (attributes.MAX_VELOCITY * Math.sin(Math.toRadians(theta)));
+			 yVelocity = (attributes.MAX_VELOCITY * -Math.cos(Math.toRadians(theta)));
+		 }
 	 }
-	 
+
 	 private void stabilize(){
 		 xVelocity *= attributes.STABILIZE_COEFF;
 		 yVelocity *= attributes.STABILIZE_COEFF;
 		 //At a particular speed ship will be stopped, this minimum speed increases with stabilize coeff.
-		 if(Math.sqrt(xVelocity*xVelocity+yVelocity*yVelocity) < (0.4/attributes.STABILIZE_COEFF)){
+		 if(getVelocity() < (0.1/attributes.STABILIZE_COEFF)){
 			 yVelocity =  xVelocity = 0;
 		 }
 	 }
-	 private void rotate(double angularVelocity){
-		 rotation += angularVelocity*timeInterval;
-		 rotation = rotation % 360;
+
+	 protected void rotate(double angularVelocity){
+		 super.rotate(angularVelocity*timeInterval);
 	 }
+
 	 /********************************* Weapon Methods *********************************/
 	 private void fire(){
 		if(attributes.CHARGE > 0){

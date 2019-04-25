@@ -5,8 +5,6 @@ import java.util.ArrayList;
 public class AiController extends Controller {
 	
 	private Ship target;               //Uses to target player
-	private boolean keyLockedOn;             //Flags whether ai is locked onto player.
-	private boolean keyAvoidance;            //Used to notify ship when to flee    
 	private ArrayList<Asteroid> asteroids;   //Used by AI for avoidance
 	private double SCANNER_RANGE = 100;      //Used as range for collision avoidance
 	private double distance;                 //Distance from target
@@ -30,87 +28,74 @@ public class AiController extends Controller {
 		distance = getDistance(target.position);
 		range = getRange();
 		//Scanning surrounding pace for threats
-		checkInRange();
-		//If no imminent threat is near, targeting enemy and pursuing 
-		if(!keyAvoidance){
-			//Setting targeting tolerance for ship, and sending true as to attempt to target and not flee
-			findTarget(TARGETTING_TOLERANCE, !keyAvoidance, target.position);
-			//Finds targets angle and distance, rotating ship accordingly
-			checkFireRange();
+		int asteroidIndex = asteroidsInRange();
+		
+		if(asteroidIndex > -1){
+			avoid(asteroids.get(asteroidIndex).position);
+		}else{
+			track();
 		}
 	}
 	
 	//Finds target to avoid or chase 
-	private double TARGETTING_TOLERANCE = 2;
+	private double TARGETTING_TOLERANCE = 5;
 	//Acceleration modifiers
 	private double AST_AVOID_TURN_MODIFIER = 2;
 	private double AST_AVOID_STRAIGHT_MODIFIER = 0.8;
+	private double TARGET_STRAIGHT_MODIFIER = 0.6;
 	private double TARGET_TURN_MODIFIER = 4;
 	//Tolerance (angle) modifiers
 	private double EARLY_TARGET_TURN_ACC_MODIFIER = 20;
 	private double EARLY_AST_TURN_ACC_MODIFIER = 0.5;
 	
-	private void findTarget(double tolerance, boolean chasing, Point object){
-		/************************************* Setting up angles ******************************************/
-		double angle = getAngle(object);            //Angle of aiShip to object
-		double diff = getDiffAngle(object);         //Difference in angle between the rotation of the ship and the angle calculated above
-		double absDiff = Math.abs(angle-ship.rotation);  //Yet another difference angle.
+	private void track(){
+		double angle = getAngle(target.position);        //Angle of aiShip to object
+		double diff  = getDiffAngle(angle);
+		double absDiff = Math.abs(diff);  //Yet another difference angle.
+
 		/************************************* Checking Direction ******************************************/
+		System.out.println("Tracking");
+		System.out.println("angle "  + angle);
+		System.out.println("absDiff " + absDiff);
+		System.out.println("diff" + diff);
+		System.out.println("ship " + ship.rotation);
+
 	    //Targeting Player
-		if(absDiff <= tolerance && chasing){
+		if(absDiff <= TARGETTING_TOLERANCE){
+			System.out.println("Within tolerance");
 			keyRotateCCW = false;
 			keyRotateCW = false;
-			keyLockedOn = true;
-			pathFinding();
-			return;
-		}else if (chasing){
-			if(diff <= 0){
-			keyRotateCCW = true;
-			keyRotateCW = false;
-			}else{
-			keyRotateCCW = false;
-			keyRotateCW = true;
-			}
+			boolean accelerate = distance > range/4;
+			System.out.println(distance + "m away from target with range" + range/4 + " accelerate " + accelerate);
+			setAcceleration(accelerate, TARGET_STRAIGHT_MODIFIER);
+			checkFireRange();
+		}else{
+			System.out.println("Not tolerance" + angle);
+			setRotation(diff);
 			//If ship is angled somewhat towards its target will accelerate away while still rotating
-			if(absDiff <= EARLY_TARGET_TURN_ACC_MODIFIER*tolerance){
+			if(absDiff <= EARLY_TARGET_TURN_ACC_MODIFIER*TARGETTING_TOLERANCE){
 				setAcceleration(true, TARGET_TURN_MODIFIER);
-			}else{
-				keyAccelerate = false;
-				keyStabilize = true;
-			}
-			return;
-		}
-		
-		/******************************** Avoidance Algorithm *******************************/
-		//If ship is sufficiently facing away from the asteroid it will accelerate away
-		if(absDiff >= tolerance && !chasing){
-			keyRotateCCW = false;
-			keyRotateCW = false;
-			//Fleeing at increased rate
-			setAcceleration(true, AST_AVOID_STRAIGHT_MODIFIER);
-			keyLockedOn = false;
-			//Ship must continue to turn away
-		}else if(!chasing){
-			if(diff >= 0){
-				keyRotateCCW = true;
-				keyRotateCW = false;
-			}else{
-				keyRotateCCW = false;
-				keyRotateCW = true;
-			}
-			keyLockedOn = false;
-			//If ship is angled somewhat will accelerate away while still rotating
-			if(absDiff >= EARLY_AST_TURN_ACC_MODIFIER*tolerance){
-				setAcceleration(true, AST_AVOID_TURN_MODIFIER);
 			}else{
 				setAcceleration(false, 0);
 			}
 		}
-	}	
+	}
+
+	private void setRotation(double diff) {
+		if(diff <= 180){
+			keyRotateCCW = false;
+			keyRotateCW = true;
+		}else{
+			keyRotateCCW = true;
+			keyRotateCW = false;
+		}
+	}
+
 	//Calculates the aiShips range
 	private double getRange(){
-		return (ship.getVelocity()+2*ship.getStrength())*(ship.timeInterval*ship.getBulletRange());
+		return ship.getBulletRange();
 	}
+	
 	//Modifies acceleration booleans and value
 	private void setAcceleration(boolean accelerate, double factor){
 		if(accelerate){
@@ -118,30 +103,17 @@ public class AiController extends Controller {
 			keyStabilize = false;
 			ship.setAcceleration(ship.getMaxAcceleration()/factor);
 		}else{
-			keyAccelerate = true;
-			keyStabilize = false;
-		}
-	}
-	//Will be improved later, for now heads to player when locked on.
-	private void pathFinding(){
-		//If within close enough proximity ship will stop
-		if(keyLockedOn && distance > range/2){
-			keyStabilize = false;
-			keyAccelerate = true;
-		}else{
-			keyStabilize = true;
 			keyAccelerate = false;
+			keyStabilize = true;
 		}
 	}
+	
 	//Checks whether ai is in range to fire
 	private void checkFireRange(){
 		//Assuming they shouldn't fire
 		keyFire = false;
-		if(keyLockedOn){
-			//Calculating the distance between ai and player
-			if(distance <= range){
-				keyFire = true;
-			}
+		if(distance <= range){
+			keyFire = true;
 		}
 	}
 	
@@ -151,8 +123,14 @@ public class AiController extends Controller {
 		return Math.sqrt((deltaX)*(deltaX)+(deltaY)*(deltaY));
 	}
 	
-	private double getDiffAngle(Point point){
-		double angle = getAngle(point);
+	private double  getAngle(Point point){
+		double angle = -Math.atan2(point.x - ship.position.x, point.y - ship.position.y);
+		angle += Math.PI;
+		angle = Math.toDegrees(angle);
+		return angle;
+	}
+	
+	private double getDiffAngle(double angle){
 		if(ship.rotation < 0){
 			ship.rotation += 360;
 		}	
@@ -162,34 +140,46 @@ public class AiController extends Controller {
 		return diff;
 	}
 	
-	private double  getAngle(Point point){
-		double angle = -Math.atan2(point.x - ship.position.x, point.y - ship.position.y);
-		angle += Math.PI;
-		angle = Math.toDegrees(angle);
-		if(angle < 0){
-			angle += 360;
-		}
-		return angle;
-	}
 	/******************************************* Collision Avoidance Methods *****************************************/
+	private int AVOIDANCE_TOLERANCE = 180; //The angle tolerance for facing away 
+
 	//Method scans all asteroid checking for any in range
-	private void checkInRange(){
+	private int asteroidsInRange(){
 		//Assuming no avoidance necessary, turning flag off
-		keyAvoidance = false;
+		double distance = SCANNER_RANGE;
+		double minDistance = SCANNER_RANGE;
+		int index = -1;
+		
 		for(int i = 0; i < asteroids.size(); i++){
-			if(SCANNER_RANGE > getDistance(asteroids.get(i).position)){
-				checkCollision(i);
+			distance = getDistance(asteroids.get(i).position);
+			if(distance < minDistance){
+				minDistance = distance;
+				index = i;
 			}
 		}
+		return index;
 	}
-	
-	private int AVOIDANCE_TOLERANCE = 180; //The number of frames to run the test for
-	//Check is the asteroid and sip will collide
-	private void checkCollision(int index){
-		//Denoting that ship is not locking onto target but fleeing
-		keyLockedOn = false;
-		//Creating temporary variables to project the ships ad asteroids path.
-		keyAvoidance = true;
-		findTarget(AVOIDANCE_TOLERANCE, keyLockedOn, asteroids.get(index).position);
+
+	private void avoid(Point object) {
+		double angle = getAngle(object);            	 //Angle of aiShip to object
+		double absDiff = Math.abs(angle-ship.rotation);  //Yet another difference angle.
+		
+		//If ship is sufficiently facing away from the asteroid it will accelerate away
+		if(absDiff >= AVOIDANCE_TOLERANCE){
+			keyRotateCCW = false;
+			keyRotateCW = false;
+			//Fleeing at increased rate
+			setAcceleration(true, AST_AVOID_STRAIGHT_MODIFIER);
+		}else{
+			setRotation(absDiff);
+
+			//If ship is angled somewhat will accelerate away while still rotating
+			if(absDiff >= EARLY_AST_TURN_ACC_MODIFIER*AVOIDANCE_TOLERANCE){
+				setAcceleration(true, AST_AVOID_TURN_MODIFIER);
+			}else{
+				setAcceleration(false, 0);
+			}
+		}
+		
 	}
 }

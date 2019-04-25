@@ -92,8 +92,11 @@ class Polygon extends Shape{
 	  return false;
   }
   
-  public void rotate(int degrees) {
+  protected void rotate(double degrees) {
 	  rotation = (rotation+degrees)%360;
+	  if( rotation <= 0 ){
+		  rotation = 360 - rotation;
+	  }
   }
   
   /*

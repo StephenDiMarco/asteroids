@@ -21,14 +21,15 @@ public class Asteroids extends Game {
     private boolean updateThread;
     //Stores game objects
     private Ship ship;
-    protected ArrayList < Bullet > playerBullets; //Will be used for AIs fire as well
+    private ArrayList < Bullet > playerBullets; //Will be used for AIs fire as well
     private ArrayList < Asteroid > asteroids;
     private ArrayList < Ship > ships;
-    protected ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
+    private ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
     private UpgradeFactory upgradeFactory;
+    private ShipFactory shipFactory;
     private GsonUtility gsonUtility;
     private Star[] stars;
-    private ArrayList < Upgrades > upgrades; //Only one can appear on screen at a time
+    private ArrayList < Upgrades > upgrades;
     //Stats
     private int level;
     private int score;
@@ -49,6 +50,7 @@ public class Asteroids extends Game {
         //Setting updateThread to false to begin;
         updateThread = false;
     }
+    
     public void newGame() {
         //Submitting score over 0
         if (score > 0) {
@@ -62,14 +64,14 @@ public class Asteroids extends Game {
         upgrades = new ArrayList < Upgrades > ();
 
         this.gsonUtility = new GsonUtility();
-
+        this.upgradeFactory = new UpgradeFactory(gsonUtility);
+        this.shipFactory = new ShipFactory(gsonUtility);
+        
         //Creating the ship and its bullets
         playerBullets = new ArrayList < Bullet > ();
-        this.ship = createShip(SHIP_SHAPE, new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), true);
+        this.ship = shipFactory.createPlayerShip(new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), playerBullets);
         this.addKeyListener(((PlayerController)ship.getController()));
         
-        this.upgradeFactory = new UpgradeFactory(gsonUtility);
-
         //Initialising ArrayList
         asteroids = new ArrayList < Asteroid > ();
 
@@ -170,7 +172,7 @@ public class Asteroids extends Game {
                 inPosition = new Point(origin.x + 10 * levelAster * Math.random(), origin.y + 10 * levelAster * Math.random());
             }
             //Creating new Asteroid
-            asteroids.add(new Asteroid(tempPoints, inPosition, TIME_INTERVAL, levelAster));
+            asteroids.add(new Asteroid(tempPoints, inPosition, levelAster));
         }
 
     }
@@ -200,52 +202,23 @@ public class Asteroids extends Game {
     //Array of points to be parsed and made into predefined objects
 
 	//Ship array
-	protected double[] SHIP_SHAPE = {10,-19, 9.25,-19, 7,-5.5, 0,-3, 0,0, 7,0, 7,3, 9,3, 9,0, 
-			 							11,0, 11,3, 13,3, 13,0, 20,0, 20,-3, 13,-5.5, 10.75,-19};
-	//Ship array
     protected double[] ALIEN_SHIP_SHAPE = {0,0, 2,1, 2,2.5, 5,4, 5,-11, 7,-12, 9,-9, 11,-2, 12,5, 
 				 							8,9, 3,6, -3,6, -8,9, -12,5, -11,-2, -9,-9, -7,-12, -5,-11, -5,4,
 				 							-2,2.5, -2,1};
 
-    private Polygon createObject(double[] shape, Point inPosition) {
-        //Drawing object shape, begining
-        Point[] shapePoints = new Point[(shape.length) / 2];
-        //Filling in points
-        for (int i = 0, j = 0; i < shapePoints.length; i++, j += 2) {
-            shapePoints[i] = new Point(shape[j], shape[j + 1]);
-        }
-        //Creating object
-        return new Polygon(shapePoints, inPosition, TIME_INTERVAL);
-    }
-
-    //CreatesShip
-    @SuppressWarnings("unchecked")
-    private Ship createShip(double[] shape, Point inPosition, boolean player) {
-    	return createShip(shape, inPosition, player, "ships/sparrow.json");
-    }
-    
-    private Ship createShip(double[] shape, Point inPosition, boolean player, String shipType) {
-        //Creating ship from generic polygon object
-        Polygon shipShape = createObject(shape, inPosition);
-        //Determining whether AI or player ship
-        if (player) {
-            PlayerController controller = new PlayerController();
-            ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
-            return new Ship(shipShape.getShape(), shipShape.position, TIME_INTERVAL, playerBullets, controller, attributes);
-        } else {
-        	// TODO clean up this awful mess
-            AiController aiController = new AiController(ship, asteroids);
-            ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
-            Ship ship = new Ship(shipShape.getShape(), shipShape.position, TIME_INTERVAL, aiBullets, aiController, attributes);
-            AiController shipController = (AiController)ship.getController();
-            shipController.setShip(ship);
-            return ship;
-        }
+    private Ship createAiShip(double[] shape, Point inPosition, boolean player, String shipType) {
+        Polygon shipShape = Utilities.CreateObject(shape, inPosition, 0);
+        AiController aiController = new AiController(ship, asteroids);
+        ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
+        Ship ship = new Ship(shipShape.getShape(), shipShape.position, aiBullets, aiController, attributes);
+        AiController shipController = (AiController)ship.getController();
+        shipController.setShip(ship);
+        return ship;
     }
     //Creating ships
-    private void createShips(int numShips, double[] shape, String shipType) {
+    private void createAiShips(int numShips, double[] shape, String shipType) {
         for (int i = 0; i < numShips; i++) {
-            ships.add((Ship) createShip(shape, findLocation(), false, shipType));
+            ships.add((Ship) createAiShip(shape, findLocation(), false, shipType));
         }
     }
 
@@ -459,7 +432,6 @@ public class Asteroids extends Game {
         brush.setColor(Color.magenta);
         for (int i = 0; i < ships.size(); i++) {
             ships.get(i).update();
-            ships.get(i).update();
             brush.fill(createShape(ships.get(i)));
         }
         //Painting aiBullets
@@ -482,7 +454,7 @@ public class Asteroids extends Game {
     private Point findLocation() {
         double x = 0, y = 0;
         double distance, deltaX, deltaY;
-        //Checks if there is sufficient clearance between player and asteriod upon creation
+        //Checks if there is sufficient clearance between player and asteroid upon creation
         boolean safe = false;
         while (!safe) {
             x = 0 + (int) Math.round(SCREEN_WIDTH * Math.random());
@@ -593,7 +565,7 @@ public class Asteroids extends Game {
             //Setting screen overlay
             screenOverlay = 150;
             screenOverlayMessage = "Enemy Space - Level " + level;
-            createShips(BASE_AISHIP_COUNT + level, ALIEN_SHIP_SHAPE, "ships/falcon-III.json");
+            createAiShips(BASE_AISHIP_COUNT + level, ALIEN_SHIP_SHAPE, "ships/falcon-III.json");
             //Easing difficulty moving forward
             BASE_ASTERIOD_COUNT -= 7;
         } else {
@@ -601,8 +573,8 @@ public class Asteroids extends Game {
             screenOverlay = 150;
             screenOverlayMessage = "Asteroid Belt - Level " + level;
             createAsteroids(BASE_ASTERIOD_COUNT + level, level, null);
-            createShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-I.json");
-            createShips(1, ALIEN_SHIP_SHAPE, "ships/falcon-II.json");
+            createAiShips(level, ALIEN_SHIP_SHAPE, "ships/falcon-I.json");
+            createAiShips(1, ALIEN_SHIP_SHAPE, "ships/falcon-II.json");
         }
     }
 

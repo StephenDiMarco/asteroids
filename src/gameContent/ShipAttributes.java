@@ -20,7 +20,8 @@ public class ShipAttributes {
 	
 	/********************   Movement  ********************/
 	protected double MAX_ACCELERATION;  //Sets out maximum acceleration
-	protected double ACCELERATION ;     //Used to determine change in velocity due to thrusters
+	protected double ACCELERATION;     //Used to determine change in velocity due to thrusters
+	protected double MAX_VELOCITY;     //Used to determine maximum in velocity due to thrusters
 	protected double ANGULAR_VELOCITY;  //Used to determine turning rate
 	protected double STABILIZE_COEFF;    //Used to slow down craft
 	
