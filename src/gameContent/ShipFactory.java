@@ -11,6 +11,13 @@ public class ShipFactory {
 	private static String shipPath = "ships/";
 	private static String shipFile = shipPath + "ships.json";
 	
+    /***********************************      Object Definitions        ***************************************/
+    //Array of points to be parsed and made into predefined objects
+
+	//Ship array
+    protected double[] ALIEN_SHIP_SHAPE = {0,0, 2,1, 2,2.5, 5,4, 5,-11, 7,-12, 9,-9, 11,-2, 12,5, 
+				 							8,9, 3,6, -3,6, -8,9, -12,5, -11,-2, -9,-9, -7,-12, -5,-11, -5,4,
+				 							-2,2.5, -2,1};
 
 	//Ship array
 	protected double[] SHIP_SHAPE = {10,-19, 9.25,-19, 7,-5.5, 0,-3, 0,0, 7,0, 7,3, 9,3, 9,0, 
@@ -25,6 +32,16 @@ public class ShipFactory {
         PlayerController controller = new PlayerController();
         ShipAttributes attributes = gsonUtility.deserializeFile("ships/sparrow.json", ShipAttributes.class);
         return new Ship(shipShape.getShape(), shipShape.position, playerBullets, controller, attributes);
+	}
+	
+    public Ship createAiShip(Point inPosition, String shipType, Ship target, ArrayList<Asteroid> asteroids, ArrayList<Bullet> aiBullets) {
+    	Polygon shipShape = Utilities.CreateObject(ALIEN_SHIP_SHAPE, inPosition, 0);
+        AiController aiController = new AiController(target, asteroids);
+        ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
+        Ship ship = new Ship(shipShape.getShape(), shipShape.position, aiBullets, aiController, attributes);
+        AiController shipController = (AiController)ship.getController();
+        shipController.setShip(ship);
+        return ship;	    
 	}
 }
 
