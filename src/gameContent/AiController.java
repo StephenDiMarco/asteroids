@@ -118,7 +118,6 @@ public class AiController extends Controller {
 	}
 	
 	private double getDiffInAngleToTarget(double angle){
-		System.out.println("Ship Rot " + ship.rotation);
 		return Math.abs(angle - ship.rotation);
 	}
 	
@@ -145,7 +144,6 @@ public class AiController extends Controller {
 	private void avoid(Point object) {
 		double angleToTarget = getAngleToTarget(object);            	
 		double absDiff = getDiffInAngleToTarget(angleToTarget); 
-		System.out.println("diff" + absDiff + " angle" + angleToTarget);
 
 		//If ship is sufficiently facing away from the asteroid it will accelerate away
 		if(absDiff >= AVOIDANCE_TOLERANCE){

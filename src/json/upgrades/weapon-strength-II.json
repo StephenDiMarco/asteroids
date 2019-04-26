@@ -6,8 +6,9 @@
   },
   "attributeType": "STRENGTH",
   "name":"Explosive Weapon Damage Upgrade",
+  "score":50,
   "modifier": 0.75,
-  "duration": 200,
+  "duration": 400,
   "shape": [
     {
       "x": 0,

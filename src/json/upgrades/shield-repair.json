@@ -6,6 +6,7 @@
   },
   "attributeType": "SHIELDS",
   "name":"Shield Repair",
+  "score":20,
   "modifier": 0,
   "duration": 750,
   "shape": [

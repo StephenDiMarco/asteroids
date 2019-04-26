@@ -173,6 +173,9 @@ public class Ship extends Polygon {
 	 				restoreShields(); 
 	 			}
 	   			break;
+	 		case MAX_SHIELDS:  
+	 			restoreShields(); 
+	   			break;
 		 }
 	 }
 	 

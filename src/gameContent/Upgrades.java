@@ -9,6 +9,7 @@ public class Upgrades extends Polygon{
 	private int duration;
 	private float modifier;
 	private String name;
+	private int score;
 	
 	Upgrades(Point[] inShape, Point inPosition, ModifiableAttributeTypes attributeType, int duration, float modifier, String name, int[] rbg){
 		super(inShape, inPosition, 0);	
@@ -45,6 +46,10 @@ public class Upgrades extends Polygon{
 	
 	public String getName() {
 		return name;
+	}
+	
+	public int getScore() {
+		return score;
 	}
 	
 }

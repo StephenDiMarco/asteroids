@@ -6,6 +6,7 @@
   },
   "attributeType": "CHARGE_RATE",
   "name":"Weapon Charge Rate Upgrade",
+  "score":20,
   "modifier": 0.25,
   "duration": 750,
   "shape": [

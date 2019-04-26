@@ -6,6 +6,7 @@
   },
   "attributeType": "STRENGTH",
   "name":"Weapon Damage Upgrade",
+  "score":20,
   "modifier": 0.50,
   "duration": 750,
   "shape": [

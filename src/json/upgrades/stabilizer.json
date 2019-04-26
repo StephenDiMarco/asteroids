@@ -6,6 +6,7 @@
   },
   "attributeType": "STABILIZER",
   "name":"Stabilizer Upgrade",
+  "score":20,
   "modifier": -0.001,
   "duration": 750,
   "shape": [
