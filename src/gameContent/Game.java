@@ -13,10 +13,7 @@ import java.applet.Applet;
 @SuppressWarnings("serial")
 public abstract class Game extends Applet implements KeyListener{
 	//Controls for aspects outside of ship control
-	protected boolean keyPause;   		//Keeps track of pauses button hits
 	protected boolean keyNewGame;  		//Keeps track of new game button hits
-	protected int screenOverlay; 		//Keeps track of screenOverlays (and serves as a count down)
-	protected String screenOverlayMessage;
 	protected boolean on = true;
 	private int elsapedTime;
 	protected long lastTimeStamp;
@@ -43,7 +40,6 @@ public abstract class Game extends Applet implements KeyListener{
       paint(buffer.getGraphics());
       brush.drawImage(buffer,0,0,this);
       elsapedTime = (int) (System.currentTimeMillis() - lastTimeStamp);
-      System.out.println(elsapedTime);
       if (on) {sleep(TIME_INTERVAL-elsapedTime); repaint();}
     }
     
@@ -52,8 +48,6 @@ public abstract class Game extends Applet implements KeyListener{
       try {Thread.sleep(time);} catch(Exception exc){};
     }
     /************************************ Screen Overlay Methods *******************************/
-	//Pause getter
-	public boolean getPause(){return keyPause;}
 	//New Game getter
 	public boolean getNewGame(){return keyNewGame;}
 	//New Game setter
@@ -61,16 +55,11 @@ public abstract class Game extends Applet implements KeyListener{
 		
 
     /************************************ Misc Game Controls *******************************/
+  @Override
   public void keyPressed(KeyEvent e){
-  	//Checking pause
-	if(e.getKeyCode() == KeyEvent.VK_P){
-		keyPause ^= true;
-		screenOverlayMessage = "Pause";
-	}else if(e.getKeyCode() == KeyEvent.VK_R){
-		setNewGame(true);
-	}
 			
   }
+  
   @Override
   public void keyReleased(KeyEvent e){
 

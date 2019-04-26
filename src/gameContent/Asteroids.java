@@ -7,6 +7,7 @@ NOTE: This class is the metaphorical "main method" of your program,
 */
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.awt.geom.Path2D;
 
@@ -27,6 +28,7 @@ public class Asteroids extends Game {
     private ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
     private ArrayList < Upgrades > upgrades;    
     private Star[] stars;
+    private Hud hud;
     
     //Factories
     private GsonUtility gsonUtility;
@@ -36,7 +38,6 @@ public class Asteroids extends Game {
 
     //Stats
     private int level;
-    private int score;
     //Server Connection
     @SuppressWarnings("unused")
     private ServerConnection serverConnection;
@@ -56,8 +57,6 @@ public class Asteroids extends Game {
     
     public void newGame() {
         setNewGame(false);
-        keyPause = false;
-    	this.score = 0;
         this.level = 0;
         
         //Creating factories
@@ -76,6 +75,8 @@ public class Asteroids extends Game {
         ships = new ArrayList < Ship > ();
         upgrades = new ArrayList < Upgrades > ();
         stars = new Star[NUM_STARS];
+        hud = new Hud(SCREEN_WIDTH, SCREEN_HEIGHT, ship);
+        hud.setPause(false);
 
         newLevel();
     }
@@ -87,23 +88,17 @@ public class Asteroids extends Game {
         if (getNewGame()) {
             newGame();
         }
-
-        if (!getPause()) {
-            Graphics2D brush = (Graphics2D) g;
+        
+        Graphics2D brush = (Graphics2D) g;
+        if (!hud.getPause()) {
             updateBackground(brush);
             updateStars(brush);
             updateShip(brush);
             updateAIShip(brush);
             updateUpgrade(brush);
             updateAsteriods(brush);
-            updateHUD(brush);
+            hud.update(brush);
 
-            if (screenOverlay > 0) {
-                //Decrementing count down
-                screenOverlay--;
-                updateScreenOverlay(brush);
-
-            }
             //Collision detection
             collisionCheck();
             //Checking Status - level completion, game over
@@ -115,8 +110,7 @@ public class Asteroids extends Game {
                 update(brush);
             }
         } else {
-            Graphics2D brush = (Graphics2D) g;
-            updateScreenOverlay(brush);
+            hud.update(brush);
         }
     }
 
@@ -152,12 +146,9 @@ public class Asteroids extends Game {
             for (int index = 0; index < upgrades.size(); index++) {
                 if (ship.intersect(upgrades.get(index))) {
                     ship.upgrade(upgrades.get(index).getAttributeType(), upgrades.get(index).getModifier());
-                    //Adding overlay of upgrade acquired
-                    screenOverlayMessage = upgrades.get(index).getName();
-                    screenOverlay = 75;
+                    hud.updateOverlayMessage(upgrades.get(index).getName(), hud.UPGRADE_OVERLAY_TIME);
+                    hud.updateScore(upgrades.get(index).getScore(), upgrades.get(index).position);
                     upgrades.remove(index);
-                    //Bonus points to score
-                    score += 20;
                 }            
             } 
         }
@@ -268,31 +259,6 @@ public class Asteroids extends Game {
         brush.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
     
-    private void updateHUD(Graphics2D brush) {
-        //Lives left
-        brush.setColor(Color.white);
-        brush.drawString("Lives: " + ship.lives, 10, 20);
-        
-        //Creating charge meter
-        brush.drawString("Charge: ", 10, 35);
-        brush.fillRect(55, 25, (int) Math.round(2 * ship.getMaxCharge()), 10);
-        brush.setColor(Color.green);
-        brush.fillRect(56, 26, (int) Math.round(2 * (ship.getCharge())) - 2, 8);
-        
-        //Creating health meter
-        brush.setColor(Color.white);
-        brush.drawString("Health: ", 10, 50);
-        brush.fillRect(55, 40, (int) Math.round(6 * ship.getMaxShield()), 10);
-        brush.setColor(Color.red);
-        brush.fillRect(56, 41, (int) Math.round(6 * (ship.getShield())) - 2, 8);
-        
-        //Level status
-        brush.setColor(Color.white);
-        brush.drawString("Level: " + level, 10, 65);
-        brush.drawString("Enemies Left: " + (asteroids.size() + ships.size()), 10, 80);
-        brush.drawString("Score: " + score, 10, 95);
-    }
-    
     private void updateAsteriods(Graphics2D brush) {
         //Updating then drawing all asteroids in array
         brush.setColor(brown);
@@ -365,15 +331,7 @@ public class Asteroids extends Game {
             brush.fillOval((int) aiBullets.get(j).position.x, (int) aiBullets.get(j).position.y, aiBullets.get(j).getRadius(), aiBullets.get(j).getRadius());
         }
     }
-    private void updateScreenOverlay(Graphics2D brush) {
-        brush.setColor(Color.white);
-        brush.setFont(new Font("Overlay", Font.BOLD, 30));
-        if (screenOverlayMessage.equals("Pause")) {
-            brush.drawString(screenOverlayMessage, SCREEN_WIDTH / 2 - 6 * screenOverlayMessage.length(), SCREEN_HEIGHT / 2);
-        } else {
-            brush.drawString(screenOverlayMessage, SCREEN_WIDTH / 2 - 6 * screenOverlayMessage.length(), 40);
-        }
-    }
+
     /****************************************     Accessory Methods     *****************************************************/
     //Creates a location for the asteroid to spawn, away from player at randomized locations
     private Point findLocation() {
@@ -399,7 +357,7 @@ public class Asteroids extends Game {
     static protected int ASTEROID_BASE_SCORE = 20;
 
     private void destroyAsteriod(int index) {
-        score += ASTEROID_BASE_SCORE * asteroids.get(index).getLevel();
+        hud.updateScore(ASTEROID_BASE_SCORE * asteroids.get(index).getLevel(), asteroids.get(index).position);
         
         //Breaking asteroid down into new asteroids
         if (asteroids.get(index).getLevel() >= 2) {
@@ -416,7 +374,7 @@ public class Asteroids extends Game {
 
     //Destroys aiShip
     private void destroyShip(int index) {
-        score += ships.get(index).score();
+    	hud.updateScore(ships.get(index).score(), ships.get(index).position);
 
         //Chance item drop
         if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 1) {
@@ -445,10 +403,10 @@ public class Asteroids extends Game {
         }
         //Checking if game is over
         if (ship.lives <= 0) {
-            screenOverlayMessage = "Game Over";
             //Submitting Score
-            serverConnection = new ServerConnection(score);
-            keyPause = true;
+            serverConnection = new ServerConnection(hud.getScore());
+            hud.setPause(true);
+        	hud.updateOverlayMessage("Game Over");
         }
     }
     //resets Player's location to center of screen
@@ -463,6 +421,7 @@ public class Asteroids extends Game {
     //New level Start Up
     private int BASE_ASTERIOD_COUNT = 2;
     private int BASE_AISHIP_COUNT = 3;
+    private int POINTS_PER_LEVEL = 50;
 
     private void newLevel() {
         //Increasing level and lives
@@ -471,7 +430,7 @@ public class Asteroids extends Game {
         //Creating new stars
         createStars();
         //Level completion bonus
-        score += level * 50;
+        hud.updateScore(level * POINTS_PER_LEVEL);
         //Increasing all stats
         ship.upgrade(ShipAttributes.ModifiableAttributeTypes.STRENGTH, 0.25f);
         ship.upgrade(ShipAttributes.ModifiableAttributeTypes.MAX_CHARGE, 2f);
@@ -480,19 +439,15 @@ public class Asteroids extends Game {
         ship.upgrade(ShipAttributes.ModifiableAttributeTypes.CHARGE_RATE, 0.005f);
         //Creating new enemies
         if (level % 5 == 0) {
-            //Setting screen overlay
-            screenOverlay = 150;
-            screenOverlayMessage = "Enemy Space - Level " + level;
-            createAiShips(BASE_AISHIP_COUNT + level, "ships/falcon-III.json");
+            hud.updateOverlayMessage("Enemy Space - Level " + level);
+            createAiShips(BASE_AISHIP_COUNT + level, "falcon-III.json");
             //Easing difficulty moving forward
             BASE_ASTERIOD_COUNT -= 7;
         } else {
-            //Setting screen overlay
-            screenOverlay = 150;
-            screenOverlayMessage = "Asteroid Belt - Level " + level;
+        	hud.updateOverlayMessage("Asteroid Belt - Level " + level);
             createAsteroids(BASE_ASTERIOD_COUNT + level, level);
-            createAiShips(level, "ships/falcon-I.json");
-            createAiShips(level, "ships/falcon-II.json");
+            createAiShips(level, "falcon-I.json");
+            createAiShips(level, "falcon-II.json");
         }
     }
     
@@ -524,5 +479,13 @@ public class Asteroids extends Game {
     public void stop() {}
 
     public void destroy() {}
+    
+    public void keyPressed(KeyEvent e){
+		if(e.getKeyCode() == KeyEvent.VK_P){
+			hud.togglePause();
+		}else if(e.getKeyCode() == KeyEvent.VK_R){
+			setNewGame(true);
+		}		
+    }
 
 }
