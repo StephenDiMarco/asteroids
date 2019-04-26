@@ -48,7 +48,6 @@ public class Asteroids extends Game {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         SCREEN_WIDTH = (int)screenSize.getWidth();
         SCREEN_HEIGHT = (int)screenSize.getHeight();
-        System.out.println("Size:" + SCREEN_WIDTH + "  " + SCREEN_HEIGHT);
         
         newGame();
         //Setting updateThread to false to begin;
