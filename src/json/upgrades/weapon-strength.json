@@ -8,7 +8,7 @@
   "name":"Weapon Damage Upgrade",
   "score":20,
   "modifier": 0.50,
-  "duration": 750,
+  "duration": 5000,
   "shape": [
     {
       "x": 0,

@@ -8,7 +8,7 @@
   "name":"Explosive Weapon Damage Upgrade",
   "score":50,
   "modifier": 0.75,
-  "duration": 400,
+  "duration": 4000,
   "shape": [
     {
       "x": 0,

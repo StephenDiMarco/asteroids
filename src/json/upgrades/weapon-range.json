@@ -8,7 +8,7 @@
   "name":"Weapon Range Upgrade",
   "score":20,
   "modifier": 25,
-  "duration": 750,
+  "duration": 4500,
   "shape": [
     {
       "x": 0,

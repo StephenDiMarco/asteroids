@@ -8,7 +8,7 @@
   "name":"Shield Repair",
   "score":20,
   "modifier": 0,
-  "duration": 750,
+  "duration": 5000,
   "shape": [
     {
       "x": 0,

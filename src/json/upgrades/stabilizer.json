@@ -8,7 +8,7 @@
   "name":"Stabilizer Upgrade",
   "score":20,
   "modifier": -0.001,
-  "duration": 750,
+  "duration": 6000,
   "shape": [
     {
       "x": 0,
