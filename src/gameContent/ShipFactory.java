@@ -26,14 +26,14 @@ public class ShipFactory {
 	public Ship createPlayerShip(Point inPosition, ArrayList<Bullet> playerBullets) {
         Polygon shipShape = Utilities.CreateObject(SHIP_SHAPE, inPosition, 0);
         PlayerController controller = new PlayerController();
-        ShipAttributes attributes = gsonUtility.deserializeFile("ships/sparrow.json", ShipAttributes.class);
+        ShipAttributes attributes = gsonUtility.deserializeFile(shipPath + "sparrow.json", ShipAttributes.class);
         return new Ship(shipShape.getShape(), shipShape.position, playerBullets, controller, attributes);
 	}
 	
     public Ship createAiShip(Point inPosition, String shipType, Ship target, ArrayList<Asteroid> asteroids, ArrayList<Bullet> aiBullets) {
     	Polygon shipShape = Utilities.CreateObject(ALIEN_SHIP_SHAPE, inPosition, 0);
         AiController aiController = new AiController(target, asteroids);
-        ShipAttributes attributes = gsonUtility.deserializeFile(shipType, ShipAttributes.class);
+        ShipAttributes attributes = gsonUtility.deserializeFile(shipPath + shipType, ShipAttributes.class);
         Ship ship = new Ship(shipShape.getShape(), shipShape.position, aiBullets, aiController, attributes);
         AiController shipController = (AiController)ship.getController();
         shipController.setShip(ship);
