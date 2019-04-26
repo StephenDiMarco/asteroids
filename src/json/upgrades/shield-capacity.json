@@ -6,6 +6,7 @@
   },
   "attributeType": "MAX_SHIELDS",
   "name": "Shield Capacity Upgrade",
+  "score":20,
   "modifier": 2,
   "duration": 750,
   "shape": [

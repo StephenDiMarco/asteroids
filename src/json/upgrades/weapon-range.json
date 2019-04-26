@@ -6,6 +6,7 @@
   },
   "attributeType": "BULLET_RANGE",
   "name":"Weapon Range Upgrade",
+  "score":20,
   "modifier": 25,
   "duration": 750,
   "shape": [
