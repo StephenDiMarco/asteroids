@@ -277,7 +277,7 @@ public class Asteroids extends Game {
 		            brush.setColor(upgrades.get(index).getColor());
 		            brush.fill(createShape(upgrades.get(index)));
 		            //Decrementing upgrade time
-		            upgrades.get(index).decreaseDuration();
+		            upgrades.get(index).decreaseDuration(elapsedTime);
 		            //Checking if time is depleted
 		            if (upgrades.get(index).getDuration() <= 0) {
 		            	upgrades.remove(index);

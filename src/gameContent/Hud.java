@@ -7,23 +7,24 @@ import java.util.ArrayList;
 
 public class Hud {
 
-	public int SCREEN_OVERLAY_TIMER_DEFAULT = 150;
-	public int UPGRADE_OVERLAY_TIME = 75;
-	public int SCORE_OVERLAY_TIME = 50;
+	public int SCREEN_OVERLAY_TIMER_DEFAULT = 4000;
+	public int UPGRADE_OVERLAY_TIME = 3000;
+	public int SCORE_OVERLAY_TIME = 1500;
 	
 	private String screenOverlayMessage;
 	private String previousScreenOverlayMessage;
-	private int screenOverlayTimer;
+	private long screenOverlayTimer;
 	private int width;
 	private int height;
 	
 	private Ship ship;
 	private int score;
 	private boolean pause; 
+	private long lastTimeStamp;
 	
 	private class ScoreOverlay{
 	    public String score;
-	    public int duration;
+	    public long duration;
 	    public int x;
 	    public int y;
 	    
@@ -44,6 +45,7 @@ public class Hud {
 		this.ship = ship;
 		this.scoreOverlays = new ArrayList <ScoreOverlay>();
 		this.pause = false;
+		this.lastTimeStamp = System.currentTimeMillis();
 	}
 	
 	public void updateOverlayMessage(String message) {
@@ -87,27 +89,30 @@ public class Hud {
 	}
 	
     public void update(Graphics2D brush) {
-        //Lives left
+        long elsapedTime = System.currentTimeMillis() - lastTimeStamp;
+		this.lastTimeStamp = System.currentTimeMillis();
+		
         brush.setColor(Color.white);
         brush.drawString("Lives: " + ship.lives, 10, 20);
         
         updateChargeMeter(brush);
         
         updateHealthMeter(brush);
-        //Level status
+        
         brush.setColor(Color.white);
         brush.drawString("Score: " + score, 10, 95);
         
         if (screenOverlayTimer > 0) {
-            updateScreenOverlay(brush);
+            updateScreenOverlay(brush, elsapedTime);
         } 
         
         if (!scoreOverlays.isEmpty() && !pause) {
-        	updateScoreOverlays(brush);
+        	updateScoreOverlays(brush, elsapedTime);
         }
     }
 
     private void updateChargeMeter(Graphics2D brush) {
+        brush.setColor(Color.white);
         brush.drawString("Charge: ", 10, 35);
         brush.fillRect(55, 25, (int) Math.round(2 * ship.getMaxCharge()), 10);
         brush.setColor(Color.green);
@@ -122,23 +127,23 @@ public class Hud {
         brush.fillRect(56, 41, (int) Math.round(6 * (ship.getShield())) - 2, 8);
     }
     
-    private void updateScreenOverlay(Graphics2D brush) {
+    private void updateScreenOverlay(Graphics2D brush, long elsapedTime) {
         brush.setColor(Color.white);
         brush.setFont(new Font("Overlay", Font.BOLD, 30));
         if (pause) {
             brush.drawString(screenOverlayMessage, width / 2 - 6 * screenOverlayMessage.length(), height / 2);
         } else {
             brush.drawString(screenOverlayMessage, width / 2 - 6 * screenOverlayMessage.length(), 40);
-        	screenOverlayTimer--;
+        	screenOverlayTimer -= elsapedTime;
         }
     }
     
-    private void updateScoreOverlays(Graphics2D brush) {
+    private void updateScoreOverlays(Graphics2D brush, long elsapedTime) {
         brush.setColor(Color.gray);
         brush.setFont(new Font("Overlay", Font.BOLD, 15));
     	for (int i = 0; i < scoreOverlays.size(); i++) {
     		ScoreOverlay scoreOverlay = scoreOverlays.get(i); 
-    		scoreOverlay.duration--;
+    		scoreOverlay.duration -= elsapedTime;
     		brush.drawString(scoreOverlay.score, scoreOverlay.x, scoreOverlay.y);
     		scoreOverlay.y--;
     		if(scoreOverlay.duration <= 0) {

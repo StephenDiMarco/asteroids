@@ -15,7 +15,7 @@ public abstract class Game extends Applet implements KeyListener{
 	//Controls for aspects outside of ship control
 	protected boolean keyNewGame;  		//Keeps track of new game button hits
 	protected boolean on = true;
-	private int elsapedTime;
+	protected long elapsedTime;
 	protected long lastTimeStamp;
 
 	//Graphics support
@@ -39,8 +39,8 @@ public abstract class Game extends Applet implements KeyListener{
     public void update(Graphics brush) {
       paint(buffer.getGraphics());
       brush.drawImage(buffer,0,0,this);
-      elsapedTime = (int) (System.currentTimeMillis() - lastTimeStamp);
-      if (on) {sleep(TIME_INTERVAL-elsapedTime); repaint();}
+      elapsedTime = (int) (System.currentTimeMillis() - lastTimeStamp);
+      if (on) {sleep(TIME_INTERVAL-(int)elapsedTime); repaint();}
     }
     
     // 'sleep' is a simple helper function used in 'update'.

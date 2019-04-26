@@ -36,8 +36,8 @@ public class Upgrades extends Polygon{
 		return duration;
 	}
 
-	public void decreaseDuration() {
-		this.duration--;
+	public void decreaseDuration(long elapsedTime) {
+		this.duration -= elapsedTime;
 	}
 	
 	public float getModifier() {
