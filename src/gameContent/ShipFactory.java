@@ -2,14 +2,10 @@ package gameContent;
 
 import java.util.ArrayList;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 public class ShipFactory {  	 
 	
 	private GsonUtility gsonUtility;
 	private static String shipPath = "ships/";
-	private static String shipFile = shipPath + "ships.json";
 	
     /***********************************      Object Definitions        ***************************************/
     //Array of points to be parsed and made into predefined objects

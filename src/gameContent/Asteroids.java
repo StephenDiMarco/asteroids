@@ -15,21 +15,25 @@ public class Asteroids extends Game {
 
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
-    private int MAX_POINTS = 15; //Max number of points on an asteroid
     private int MIN_DISTANCE = 60; //The minimum distance an asteroid can spawn away from a player
     private int NUM_STARS = 130;
     private boolean updateThread;
+    
     //Stores game objects
     private Ship ship;
     private ArrayList < Bullet > playerBullets; //Will be used for AIs fire as well
     private ArrayList < Asteroid > asteroids;
     private ArrayList < Ship > ships;
     private ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
-    private UpgradeFactory upgradeFactory;
-    private ShipFactory shipFactory;
-    private GsonUtility gsonUtility;
+    private ArrayList < Upgrades > upgrades;    
     private Star[] stars;
-    private ArrayList < Upgrades > upgrades;
+    
+    //Factories
+    private GsonUtility gsonUtility;
+    private AsteroidFactory asteroidFactory;
+    private ShipFactory shipFactory;
+    private UpgradeFactory upgradeFactory;
+
     //Stats
     private int level;
     private int score;
@@ -37,7 +41,7 @@ public class Asteroids extends Game {
     @SuppressWarnings("unused")
     private ServerConnection serverConnection;
     //Custom Colors
-    protected Color brown = new Color(139, 75, 60);
+    private Color brown = new Color(139, 75, 60);
 
     //Constructor	
     public Asteroids() {
@@ -52,74 +56,49 @@ public class Asteroids extends Game {
     }
     
     public void newGame() {
-        //Submitting score over 0
-        if (score > 0) {
-            serverConnection = new ServerConnection(score);
-        }
+        setNewGame(false);
+        keyPause = false;
+    	this.score = 0;
         this.level = 0;
-        //Resetting enemy base counts
-        BASE_ASTERIOD_COUNT = 2;
-        BASE_AISHIP_COUNT = 3;
-        //Resetting upgrade
-        upgrades = new ArrayList < Upgrades > ();
-
-        this.gsonUtility = new GsonUtility();
-        this.upgradeFactory = new UpgradeFactory(gsonUtility);
-        this.shipFactory = new ShipFactory(gsonUtility);
         
-        //Creating the ship and its bullets
+        //Creating factories
+        this.gsonUtility = new GsonUtility();
+        this.asteroidFactory = new AsteroidFactory();
+        this.shipFactory = new ShipFactory(gsonUtility);
+        this.upgradeFactory = new UpgradeFactory(gsonUtility);
+ 
+        //Creating scene object stores
+        asteroids = new ArrayList < Asteroid > ();
         playerBullets = new ArrayList < Bullet > ();
         this.ship = shipFactory.createPlayerShip(new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), playerBullets);
+        this.ship.lives = 3;
         this.addKeyListener(((PlayerController)ship.getController()));
-        
-        //Initialising ArrayList
-        asteroids = new ArrayList < Asteroid > ();
-
-        //Creating ship ArrayList
         aiBullets = new ArrayList < Bullet > ();
         ships = new ArrayList < Ship > ();
-        this.ship.lives = 3;
-        //Creating the stars
+        upgrades = new ArrayList < Upgrades > ();
         stars = new Star[NUM_STARS];
 
-        //Starting new level, creates enemies.
         newLevel();
-        //Setting score to zero
-        this.score = 0;
     }
 
     @Override
     public void paint(Graphics g) {
     	lastTimeStamp = System.currentTimeMillis();
-        //Checking for new game
+    	
         if (getNewGame()) {
-            //Creating new game
             newGame();
-            //Resetting new game flag
-            setNewGame(false);
-            //Unpausing Screen updates
-            keyPause = false;
         }
-        //Checking for pause
+
         if (!getPause()) {
             Graphics2D brush = (Graphics2D) g;
-            //Setting background of space
-            brush.setColor(Color.black);
-            brush.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-            //Adding Stars
-            brush.setColor(Color.white);
+            updateBackground(brush);
             updateStars(brush);
-            //Adding Ship
             updateShip(brush);
-            //Adding the aiShips
             updateAIShip(brush);
-            //Adding Upgrades
             updateUpgrade(brush);
-            //Updating then drawing all asteroids in array
             updateAsteriods(brush);
-            //Screen HUD
             updateHUD(brush);
-            //Checking  for screen overlay
+
             if (screenOverlay > 0) {
                 //Decrementing count down
                 screenOverlay--;
@@ -157,48 +136,6 @@ public class Asteroids extends Game {
         return path;
     }
     /************************************     Object Creation         *************************************/
-    //Creates a number of Asteroids depenedent on player level
-    private void createAsteroids(int numAsteroids, int levelAster, Point origin) {
-        //Start of a new level, no specific location chosen.
-        Point[] tempPoints = new Point[MAX_POINTS];
-        //Creating proper number of asteroids for level
-        for (int i = 0; i < numAsteroids; i++) {
-            //Creating Asteroid Shape in a static method in Asteroid
-            tempPoints = createAsteroid(levelAster);
-            //Placing it in a free location
-            Point inPosition;
-            if (origin == null) {
-                inPosition = findLocation();
-            } else {
-                inPosition = new Point(origin.x + 10 * levelAster * Math.random(), origin.y + 10 * levelAster * Math.random());
-            }
-            //Creating new Asteroid
-            asteroids.add(new Asteroid(tempPoints, inPosition, levelAster));
-        }
-
-    }
-
-    //Creates an asteroid
-    private double BASE_RADIUS = 200;
-    private Point[] createAsteroid(int Asteroidlevel) {
-        //Drawing asteroid shape, begining with at least 5 points, increasing with size
-        int nPoints = (int)(4 + Asteroidlevel + Math.floor(8 * Math.random()));
-        Point[] asterShape = new Point[nPoints];
-        //Creating Asteroid shape, the sqrt function gives a leveling in the size increase with each level
-        double radius = Math.sqrt(BASE_RADIUS * Math.sqrt(Asteroidlevel));
-        //Creating first point
-        asterShape[0] = new Point(0, radius);
-        //Creating points other points with bumpy texture
-        for (int i = 1; i < nPoints; i++) {
-            //Creating altered x,y pos on circle
-            int x = (int) Math.round(radius * (Math.sin(2 * Math.PI * i / nPoints)) + 5 - (int) Math.round((8 + Asteroidlevel * 1.5) * Math.random()));
-            int y = (int) Math.round(radius * (Math.cos(2 * Math.PI * i / nPoints)) + 5 - (int) Math.round((8 + Asteroidlevel * 1.5) * Math.random()));
-            asterShape[i] = new Point(x, y);
-        }
-        //Creating ship
-        return asterShape;
-    }
-
     private void createStars() {
         for (int i = 0; i < NUM_STARS; i++) {
             //Randomly placing and sizing stars
@@ -327,28 +264,36 @@ public class Asteroids extends Game {
         }
     }
     /****************************************     Update Methods     *****************************************************/
+    private void updateBackground(Graphics2D brush) {
+        brush.setColor(Color.black);
+        brush.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    }
+    
     private void updateHUD(Graphics2D brush) {
-        //Hud Creation
         //Lives left
         brush.setColor(Color.white);
         brush.drawString("Lives: " + ship.lives, 10, 20);
+        
         //Creating charge meter
         brush.drawString("Charge: ", 10, 35);
         brush.fillRect(55, 25, (int) Math.round(2 * ship.getMaxCharge()), 10);
         brush.setColor(Color.green);
         brush.fillRect(56, 26, (int) Math.round(2 * (ship.getCharge())) - 2, 8);
+        
         //Creating health meter
         brush.setColor(Color.white);
         brush.drawString("Health: ", 10, 50);
         brush.fillRect(55, 40, (int) Math.round(6 * ship.getMaxShield()), 10);
         brush.setColor(Color.red);
         brush.fillRect(56, 41, (int) Math.round(6 * (ship.getShield())) - 2, 8);
+        
         //Level status
         brush.setColor(Color.white);
         brush.drawString("Level: " + level, 10, 65);
         brush.drawString("Enemies Left: " + (asteroids.size() + ships.size()), 10, 80);
         brush.drawString("Score: " + score, 10, 95);
     }
+    
     private void updateAsteriods(Graphics2D brush) {
         //Updating then drawing all asteroids in array
         brush.setColor(brown);
@@ -357,6 +302,7 @@ public class Asteroids extends Game {
             brush.fill(createShape(asteroids.get(i)));
         }
     }
+    
     //Makes checks and paints images
     private void updateUpgrade(Graphics2D brush) {
         //Drawing the upgrade
@@ -375,7 +321,10 @@ public class Asteroids extends Game {
             }
         }
     }
+    
     private void updateStars(Graphics2D brush) {
+        //Adding Stars
+        brush.setColor(Color.white);
         //Setting background stars
         for (int i = 0; i < NUM_STARS; i++) {
             //Randomly tinkling star
@@ -447,27 +396,20 @@ public class Asteroids extends Game {
         return new Point(x, y);
     }
     /***********  Asteroid Variables     **********/
-    static protected int ASTEROID_DROP_CHANCE = 3;
+    static protected float ASTEROID_DROP_CHANCE = 0.10f;
     static protected int ASTEROID_BASE_SCORE = 20;
 
     private void destroyAsteriod(int index) {
         score += ASTEROID_BASE_SCORE * asteroids.get(index).getLevel();
-        //Breaking Asteroid Down into new asteroids
+        
+        //Breaking asteroid down into new asteroids
         if (asteroids.get(index).getLevel() >= 2) {
-            //Sends in the number of asteroids to be generated (equal to level, maxs at 4), their level and position.
-            int numAster = asteroids.get(index).getLevel();
-            //Larger asteroids only break in half
-            if (numAster > 4) {
-                numAster = 2;
-            }
-            createAsteroids(numAster, asteroids.get(index).getLevel() - 1, asteroids.get(index).position);
+            asteroids.addAll(asteroidFactory.splitAsteroid(asteroids.get(index)));
         } else {
-            //Chance item drop
-            if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 2) {
+            if (Math.random() <= ASTEROID_DROP_CHANCE) {
             	addUpgradeToScene(asteroids.get(index).position);
             }
         }
-        //Destroying Asteroid
         asteroids.remove(index);
     }
 
@@ -549,7 +491,7 @@ public class Asteroids extends Game {
             //Setting screen overlay
             screenOverlay = 150;
             screenOverlayMessage = "Asteroid Belt - Level " + level;
-            createAsteroids(BASE_ASTERIOD_COUNT + level, level, null);
+            createAsteroids(BASE_ASTERIOD_COUNT + level, level);
             createAiShips(level, "ships/falcon-I.json");
             createAiShips(level, "ships/falcon-II.json");
         }
@@ -558,6 +500,12 @@ public class Asteroids extends Game {
 	public void createAiShips(int numShips, String type) {
         for (int i = 0; i < numShips; i++) {
             ships.add((Ship) shipFactory.createAiShip(findLocation(), type, ship, asteroids, aiBullets));
+        }
+	}
+	
+	public void createAsteroids(int numAsteroids, int level) {
+        for (int i = 0; i < numAsteroids; i++) {
+            asteroids.add(asteroidFactory.createAsteroid(findLocation(), level));
         }
 	}
 	

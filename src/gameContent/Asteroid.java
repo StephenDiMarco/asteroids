@@ -5,23 +5,19 @@ public class Asteroid extends Polygon{
 	private double xVelocity;
 	private double yVelocity;
 	private double timeInterval;
-	private float health; //Represents the number of shots 
-	private int level; //Used for point scoring and division of asteroids
+	private float health;
+	private int level;
 	
-	public Asteroid(Point[] inShape, Point inPosition, int asterLevel){
+	public Asteroid(Point[] inShape, Point inPosition, int level){
 		super(inShape, inPosition, 0);
-		//Setting movement variables 
-		timeInterval = Game.GetTimeInterval();
+
 		//Randomly setting velocity, as a function of the square of the asteroids level
-		double sqrdLevel = Math.sqrt(asterLevel);
+		timeInterval = Game.GetTimeInterval();
+		double sqrdLevel = Math.sqrt(level);
 		setVelocity(sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()),sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()));
 		//Setting health dependent on level
-		level = asterLevel;
+		this.level = level;
 		health = 2*level;
-	}
-
-	public Asteroid createCopy(){
-		return new Asteroid(getShape(), position, level);
 	}
 
 	public void move(){
