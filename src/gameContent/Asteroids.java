@@ -14,7 +14,7 @@ public class Asteroids extends Game {
     private int SCREEN_WIDTH;
     private int SCREEN_HEIGHT;
     private int MIN_DISTANCE = 60; //The minimum distance an asteroid can spawn away from a player
-    private int NUM_STARS = 130;
+    private int NUM_STARS = 150;
     private boolean updateThread;
     
     //Stores game objects
