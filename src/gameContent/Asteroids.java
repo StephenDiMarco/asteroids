@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
 
 @SuppressWarnings("serial")
 public class Asteroids extends Game {
@@ -43,18 +44,32 @@ public class Asteroids extends Game {
     private ServerConnection serverConnection;
     //Custom Colors
     private Color brown = new Color(139, 75, 60);
-
+    
+	public static void main(String[] args)
+	{
+		Asteroids frame = new Asteroids ();
+		// Setting the application to be fullscreen
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setSize((int)screenSize.getWidth(),(int)screenSize.getHeight());
+		frame.setUndecorated(true);
+		frame.setVisible(true);
+		// Creating the buffer to draw on
+		frame.buffer = (BufferedImage) frame.createImage((int)screenSize.getWidth(),(int)screenSize.getHeight());
+	}
+	
     //Constructor	
     public Asteroids() {
+      	this.addWindowListener(this);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         SCREEN_WIDTH = (int)screenSize.getWidth();
         SCREEN_HEIGHT = (int)screenSize.getHeight();
+        setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         
         newGame();
         //Setting updateThread to false to begin;
         updateThread = false;
     }
-    
+
     public void newGame() {
         setNewGame(false);
         this.level = 0;
@@ -467,18 +482,6 @@ public class Asteroids extends Game {
         ship.death();
         resetPlayer();
     }
-
-    /****************************************     Applet Settings     *****************************************************/
-    public void init() {
-        setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-        buffer = createImage(SCREEN_WIDTH, SCREEN_HEIGHT);
-    }
-
-    public void start() {}
-
-    public void stop() {}
-
-    public void destroy() {}
     
     public void keyPressed(KeyEvent e){
 		if(e.getKeyCode() == KeyEvent.VK_P){

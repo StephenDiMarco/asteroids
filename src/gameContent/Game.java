@@ -1,25 +1,25 @@
 package gameContent;
-/*
-CLASS: Game
-DESCRIPTION: A painted canvas in its own window, updated every tenth second.
-USAGE: Extended by Asteroids.
-NOTE: You don't need to understand the details here, no fiddling neccessary.
-*/
+
 import java.awt.*;
 import java.awt.event.*;
-import java.applet.Applet;
-
+import java.awt.image.BufferedImage;
 
 @SuppressWarnings("serial")
-public abstract class Game extends Applet implements KeyListener{
-	//Controls for aspects outside of ship control
-	protected boolean keyNewGame;  		//Keeps track of new game button hits
+public abstract class Game extends Frame implements KeyListener, WindowListener  {
+
+	protected boolean keyNewGame;
+	
+	//New Game getter
+	public boolean getNewGame(){return keyNewGame;}
+	//New Game setter
+	public void setNewGame(boolean newGame){keyNewGame = newGame;}
+	
 	protected boolean on = true;
 	protected long elapsedTime;
 	protected long lastTimeStamp;
 
 	//Graphics support
-	protected Image buffer;
+	protected BufferedImage buffer;
 	//Time in 1/100 of a second
 	private static int TIME_INTERVAL = 10;
 	
@@ -28,10 +28,10 @@ public abstract class Game extends Applet implements KeyListener{
 	}
 	
 	public Game(){
-		//Creating the control interface
 		this.addKeyListener(this);
 	}
-	  /************************************Game Threading*******************************/
+	
+	/************************************Game Threading*******************************/
     // 'update' paints to a buffer then to the screen, then waits a tenth of
     // a second before repeating itself, assuming the game is on. This is done
     // to avoid a choppy painting experience if repainted in pieces.
@@ -47,14 +47,8 @@ public abstract class Game extends Applet implements KeyListener{
     private void sleep(int time) {
       try {Thread.sleep(time);} catch(Exception exc){};
     }
-    /************************************ Screen Overlay Methods *******************************/
-	//New Game getter
-	public boolean getNewGame(){return keyNewGame;}
-	//New Game setter
-	public void setNewGame(boolean newGame){keyNewGame = newGame;}
-		
+ 	
 
-    /************************************ Misc Game Controls *******************************/
   @Override
   public void keyPressed(KeyEvent e){
 			
@@ -69,5 +63,23 @@ public abstract class Game extends Applet implements KeyListener{
   public void keyTyped(KeyEvent e){
   	
   }
+  
+  public void windowClosing(WindowEvent e)
+  {
+	dispose();
+	System.exit(0);
+  }
+  
+  public void windowOpened(WindowEvent e) { }
+  
+  public void windowIconified(WindowEvent e){ }
+  
+  public void windowClosed(WindowEvent e){ }
+  
+  public void windowDeiconified(WindowEvent e){ }
+  
+  public void windowActivated(WindowEvent e){ }
+  
+  public void windowDeactivated(WindowEvent e) { }
   
 }

@@ -2,6 +2,7 @@ package gameContent;
 
 import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.Field;
@@ -11,8 +12,9 @@ import com.google.gson.*;
 
 public class GsonUtility {
 	
-	GsonBuilder builder;
-	JsonParser jsonParser;
+	private GsonBuilder builder;
+	private JsonParser jsonParser;
+	private String path = "src/json/";
 	
 	public GsonUtility() {
         builder = new GsonBuilder();
@@ -37,9 +39,12 @@ public class GsonUtility {
 		try {
 	        Gson gson = builder.create();
 	        BufferedReader json;
-			json = new BufferedReader(new FileReader("json/" + filename));
+	        String filePath = new File("").getAbsolutePath();
+	        System.out.println(filePath);
+			json = new BufferedReader(new FileReader(path + filename));
 	        return gson.fromJson(json, type); 
 		} catch (FileNotFoundException | JsonSyntaxException e) {
+			e.printStackTrace(); 
 		    return null;
 		}
 	}
@@ -47,7 +52,7 @@ public class GsonUtility {
 	public JsonObject getJsonObjectFromFile(String filename) {
 		try {
 	        BufferedReader json;
-			json = new BufferedReader(new FileReader("json/" + filename));
+			json = new BufferedReader(new FileReader(path + filename));
 			JsonElement jsonElement = jsonParser.parse(json);
 			
 			if(jsonElement.isJsonObject()) {
