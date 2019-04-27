@@ -12,9 +12,10 @@ USAGE: You are intended to instantiate this class with a set of points that
        is the same shape as {(9,10),(10,10),(10,9)}.
 */
 
-class Polygon extends Shape{
+class Polygon extends Shape {
   private Point[] shape;   // An array of points.
   public double rotation;  // Zero degrees is due east.
+  private double area; 
   //Do to the formatting of this Polygon object, it requires 
   
 
@@ -36,6 +37,8 @@ class Polygon extends Shape{
       p.x -= origin.x;
       p.y -= origin.y;
     }
+    
+    this.area = findArea();
   }
   
   public  Point[] getShape(){
@@ -123,7 +126,6 @@ class Polygon extends Shape{
       sum.y += (shape[i].y + shape[j].y)
                * (shape[i].x * shape[j].y - shape[j].x * shape[i].y);
     }
-    double area = findArea();
     return new Point(Math.abs(sum.x/(6*area)),Math.abs(sum.y/(6*area)));
   }
 }

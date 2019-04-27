@@ -144,6 +144,7 @@ public class Asteroids extends Game {
         }
         return path;
     }
+
     /************************************     Object Creation         *************************************/
     private void createStars() {
         for (int i = 0; i < NUM_STARS; i++) {
