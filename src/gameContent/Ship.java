@@ -84,7 +84,6 @@ public class Ship extends Polygon {
 		 }
 		//Checking Fire Delay and Fire trigger
 		 if(controller.isKeyFire() && attributes.FIRE_DELAY <= 0){
-			 audioManager.playOnce(weaponSound);
 			 fire();
 		 }else if(attributes.FIRE_DELAY > 0){
 			 attributes.FIRE_DELAY -= 0.1;
@@ -147,6 +146,7 @@ public class Ship extends Polygon {
 	 /********************************* Weapon Methods *********************************/
 	 private void fire(){
 		if(attributes.CHARGE > 0){
+			audioManager.playOnce(weaponSound);
 			bullets.add( new Bullet(position.x, position.y, (int)Math.round(attributes.STRENGTH), attributes.STRENGTH, timeInterval, rotation, attributes.BULLET_RANGE, getXVel(), getYVel()));
 			//Decrementing the charge	
 			attributes.CHARGE--;
