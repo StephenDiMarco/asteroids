@@ -39,8 +39,6 @@ public class GsonUtility {
 		try {
 	        Gson gson = builder.create();
 	        BufferedReader json;
-	        String filePath = new File("").getAbsolutePath();
-	        System.out.println(filePath);
 			json = new BufferedReader(new FileReader(path + filename));
 	        return gson.fromJson(json, type); 
 		} catch (FileNotFoundException | JsonSyntaxException e) {

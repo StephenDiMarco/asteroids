@@ -13,7 +13,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public class AudioManager {
 		  
 	private int ONCE = 0;
-	private String path = "C:/Users/Stephen DiMarco/Documents/Asteroids/asteroids/src/sound/";
+	private String path = "src/sound/";
 	
 	public String THEME = "music/theme.wav";
 	
