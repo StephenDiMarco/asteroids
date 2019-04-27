@@ -8,24 +8,27 @@ public class Ship extends Polygon {
     private ShipAttributes attributes;
 	public int lives;
 
-    //Positon information
+    //Position information
 	private double xVelocity;
 	private double yVelocity;
 	protected double timeInterval;
 	
+	//Sounds
+	private AudioManager audioManager;
+	private String weaponSound;
+	
 	/************************************** Constructors ****************************************/
-	public Ship(Point[] inShape, Point inPosition,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes){
+	public Ship(Point[] inShape, Point inPosition,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes, AudioManager audioManager, String weaponSound){
 		super(inShape, inPosition, 0);
 		//Setting time interval
 		timeInterval = Game.GetTimeInterval();
 		this.bullets = bullets;
 		this.controller = controller;
 		this.attributes = attributes;
+		this.audioManager = audioManager;
+		this.weaponSound = weaponSound;
 	}
 
-	public Ship createCopy(){
-		return new Ship(getShape(), position, bullets, controller, attributes);
-	}
 	/************************************** Getter Methods ****************************************/
 	//Weapon's getters
 	public double getCharge(){return attributes.CHARGE;}
@@ -81,6 +84,7 @@ public class Ship extends Polygon {
 		 }
 		//Checking Fire Delay and Fire trigger
 		 if(controller.isKeyFire() && attributes.FIRE_DELAY <= 0){
+			 audioManager.playOnce(weaponSound);
 			 fire();
 		 }else if(attributes.FIRE_DELAY > 0){
 			 attributes.FIRE_DELAY -= 0.1;

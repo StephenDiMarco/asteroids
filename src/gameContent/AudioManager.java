@@ -1,5 +1,6 @@
 package gameContent;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
@@ -10,20 +11,38 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioManager {
-		   
+		  
+	private int ONCE = 0;
+	private String path = "C:/Users/Stephen DiMarco/Documents/Asteroids/asteroids/src/sound/";
+	
+	public String THEME = "music/theme.wav";
+	
+	private String FX = "fx/";
+	public String PLAYER_WEAPON 		= FX + "player-weapon.wav";
+	public String ENEMY_WEAPON 			= FX + "enemy-weapon.wav";
+	public String PLAYER_DESTROYED 		= FX + "player-destroyed.wav";
+	public String SHIP_DESTROYED 		= FX + "ship-destroyed.wav";
+	public String ASTEROID_DESTROYED 	= FX + "asteroid-destroyed.wav";
+
     public AudioManager() {
-    	loadAudioFile("sound/fx/fire.wav");
+    	playLoop(THEME);
     }
    
-	private void loadAudioFile(String fileName) {
+    public void playLoop(String fileName) {
+    	loadAudioFile(fileName, Clip.LOOP_CONTINUOUSLY);
+    }
+    
+    public void playOnce(String fileName) {
+    	loadAudioFile(fileName, ONCE);
+    }
+    
+	private void loadAudioFile(String fileName, int mode) {
 		try {
-			URL url = getClass().getResource(fileName);
-			System.out.println(url);
-			Clip clip = AudioSystem.getClip();
 
-			AudioInputStream ais = AudioSystem.getAudioInputStream( url );
+			Clip clip = AudioSystem.getClip();
+			AudioInputStream ais = AudioSystem.getAudioInputStream( new File(path + fileName) );
 			clip.open(ais);
-			clip.loop(Clip.LOOP_CONTINUOUSLY);
+			clip.loop(mode);
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		} 	      

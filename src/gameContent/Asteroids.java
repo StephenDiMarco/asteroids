@@ -31,6 +31,9 @@ public class Asteroids extends Game {
     private Star[] stars;
     private Hud hud;
     
+    //Audio
+    private AudioManager audioManager;
+    
     //Factories
     private GsonUtility gsonUtility;
     private AsteroidFactory asteroidFactory;
@@ -64,6 +67,15 @@ public class Asteroids extends Game {
         SCREEN_WIDTH = (int)screenSize.getWidth();
         SCREEN_HEIGHT = (int)screenSize.getHeight();
         setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        //Sound
+        this.audioManager = new AudioManager();
+
+        //Creating factories
+        this.gsonUtility = new GsonUtility();
+        this.asteroidFactory = new AsteroidFactory();
+        this.shipFactory = new ShipFactory(gsonUtility, audioManager);
+        this.upgradeFactory = new UpgradeFactory(gsonUtility);
         
         newGame();
         //Setting updateThread to false to begin;
@@ -73,12 +85,6 @@ public class Asteroids extends Game {
     public void newGame() {
         setNewGame(false);
         this.level = 0;
-        
-        //Creating factories
-        this.gsonUtility = new GsonUtility();
-        this.asteroidFactory = new AsteroidFactory();
-        this.shipFactory = new ShipFactory(gsonUtility);
-        this.upgradeFactory = new UpgradeFactory(gsonUtility);
  
         //Creating scene object stores
         asteroids = new ArrayList < Asteroid > ();

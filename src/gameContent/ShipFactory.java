@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class ShipFactory {  	 
 	
 	private GsonUtility gsonUtility;
+	private AudioManager audioManager;
 	private static String shipPath = "ships/";
 	
     /***********************************      Object Definitions        ***************************************/
@@ -19,22 +20,23 @@ public class ShipFactory {
 	protected double[] SHIP_SHAPE = {10,-19, 9.25,-19, 7,-5.5, 0,-3, 0,0, 7,0, 7,3, 9,3, 9,0, 
 			 							11,0, 11,3, 13,3, 13,0, 20,0, 20,-3, 13,-5.5, 10.75,-19};
 	
-	public ShipFactory(GsonUtility gsonUtility) {
+	public ShipFactory(GsonUtility gsonUtility, AudioManager audioManager) {
 		this.gsonUtility = gsonUtility;
+		this.audioManager = audioManager;
 	}
 
 	public Ship createPlayerShip(Point inPosition, ArrayList<Bullet> playerBullets) {
         Polygon shipShape = Utilities.CreateObject(SHIP_SHAPE, inPosition, 0);
         PlayerController controller = new PlayerController();
         ShipAttributes attributes = gsonUtility.deserializeFile(shipPath + "sparrow.json", ShipAttributes.class);
-        return new Ship(shipShape.getShape(), shipShape.position, playerBullets, controller, attributes);
+        return new Ship(shipShape.getShape(), shipShape.position, playerBullets, controller, attributes, audioManager, audioManager.PLAYER_WEAPON);
 	}
 	
     public Ship createAiShip(Point inPosition, String shipType, Ship target, ArrayList<Asteroid> asteroids, ArrayList<Bullet> aiBullets) {
     	Polygon shipShape = Utilities.CreateObject(ALIEN_SHIP_SHAPE, inPosition, 0);
         AiController aiController = new AiController(target, asteroids);
         ShipAttributes attributes = gsonUtility.deserializeFile(shipPath + shipType, ShipAttributes.class);
-        Ship ship = new Ship(shipShape.getShape(), shipShape.position, aiBullets, aiController, attributes);
+        Ship ship = new Ship(shipShape.getShape(), shipShape.position, aiBullets, aiController, attributes, audioManager, audioManager.ENEMY_WEAPON);
         AiController shipController = (AiController)ship.getController();
         shipController.setShip(ship);
         return ship;	    
