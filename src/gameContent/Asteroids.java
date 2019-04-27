@@ -309,7 +309,7 @@ public class Asteroids extends Game {
         //Setting background stars
         for (int i = 0; i < NUM_STARS; i++) {
             //Randomly tinkling star
-            if (Math.random() * 1000 > 999) {
+            if (Math.random() > 0.995) {
                 stars[i].flipTwinkle();
             }
             brush.fillOval((int) stars[i].position.x, (int) stars[i].position.y, stars[i].getRadius(), stars[i].getRadius());
@@ -390,7 +390,6 @@ public class Asteroids extends Game {
 
     static protected int SHIP_DROP_CHANCE = 2;
 
-    //Destroys aiShip
     private void destroyShip(int index) {
     	hud.updateScore(ships.get(index).score(), ships.get(index).position);
 
@@ -431,7 +430,6 @@ public class Asteroids extends Game {
     //resets Player's location to center of screen
     private void resetPlayer() {
         //Resetting Ship
-        audioManager.playOnce(audioManager.SHIP_DESTROYED);
         ship.position.x = SCREEN_WIDTH / 2;
         ship.position.y = SCREEN_HEIGHT / 2;
         ship.rotation = 0;
@@ -485,6 +483,7 @@ public class Asteroids extends Game {
 	
     private void killPlayer() {
         ship.death();
+        audioManager.playOnce(audioManager.PLAYER_DESTROYED);
         resetPlayer();
     }
     

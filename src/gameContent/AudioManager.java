@@ -23,7 +23,8 @@ public class AudioManager {
 	public String PLAYER_DESTROYED 		= FX + "player-destroyed.wav";
 	public String SHIP_DESTROYED 		= FX + "ship-destroyed.wav";
 	public String ASTEROID_DESTROYED 	= FX + "asteroid-destroyed.wav";
-
+	public String UPGRADE_PICKUP	 	= FX + "upgrade-pickup.wav";
+	
     public AudioManager() {
     	playLoop(THEME);
     }

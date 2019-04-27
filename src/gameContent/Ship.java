@@ -167,6 +167,7 @@ public class Ship extends Polygon {
 	 }
 	 
 	 public void upgrade(ShipAttributes.ModifiableAttributeTypes type, float modifier){
+		 audioManager.playOnce(audioManager.UPGRADE_PICKUP);
 		 attributes.modifyAttribute(type, modifier);
 		 
 		 switch(type){
