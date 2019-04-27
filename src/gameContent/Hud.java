@@ -20,6 +20,7 @@ public class Hud {
 	private Ship ship;
 	private int score;
 	private boolean pause; 
+	private boolean gameOver;
 	private long lastTimeStamp;
 	
 	private class ScoreOverlay{
@@ -45,6 +46,7 @@ public class Hud {
 		this.ship = ship;
 		this.scoreOverlays = new ArrayList <ScoreOverlay>();
 		this.pause = false;
+		this.gameOver = false;
 		this.lastTimeStamp = System.currentTimeMillis();
 	}
 	
@@ -83,11 +85,20 @@ public class Hud {
 			updateOverlayMessage(previousScreenOverlayMessage);
 		}
 	}
-	
+
 	public boolean getPause() {
 		return pause;
 	}
-	
+
+	public void setGameOver(boolean value) {
+		gameOver = value;
+    	updateOverlayMessage("Game Over");
+	}
+
+	public boolean getGameOver() {
+		return gameOver;
+	}
+
     public void update(Graphics2D brush) {
         long elsapedTime = System.currentTimeMillis() - lastTimeStamp;
 		this.lastTimeStamp = System.currentTimeMillis();

@@ -1,16 +1,12 @@
 package gameContent;
-/*
-CLASS: Asteroids
-DESCRIPTION: Extending Game, Asteroids is all in the paint method.
-NOTE: This class is the metaphorical "main method" of your program,
-      it is your control center.
-*/
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
+
 
 @SuppressWarnings("serial")
 public class Asteroids extends Game {
@@ -98,7 +94,6 @@ public class Asteroids extends Game {
         stars = new Star[NUM_STARS];
         hud = new Hud(SCREEN_WIDTH, SCREEN_HEIGHT, ship);
         hud.setPause(false);
-
         newLevel();
     }
 
@@ -373,6 +368,7 @@ public class Asteroids extends Game {
         }
         return new Point(x, y);
     }
+    
     /***********  Asteroid Variables     **********/
     static protected float ASTEROID_DROP_CHANCE = 0.10f;
     static protected int ASTEROID_BASE_SCORE = 20;
@@ -388,6 +384,7 @@ public class Asteroids extends Game {
             	addUpgradeToScene(asteroids.get(index).position);
             }
         }
+        audioManager.playOnce(audioManager.ASTEROID_DESTROYED);
         asteroids.remove(index);
     }
 
@@ -401,6 +398,7 @@ public class Asteroids extends Game {
         if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 1) {
         	addUpgradeToScene(ships.get(index).position);
         }
+        audioManager.playOnce(audioManager.SHIP_DESTROYED);
         ships.remove(index);
     }
     
@@ -427,12 +425,13 @@ public class Asteroids extends Game {
             //Submitting Score
             serverConnection = new ServerConnection(hud.getScore());
             hud.setPause(true);
-        	hud.updateOverlayMessage("Game Over");
+            hud.setGameOver(true);
         }
     }
     //resets Player's location to center of screen
     private void resetPlayer() {
         //Resetting Ship
+        audioManager.playOnce(audioManager.SHIP_DESTROYED);
         ship.position.x = SCREEN_WIDTH / 2;
         ship.position.y = SCREEN_HEIGHT / 2;
         ship.rotation = 0;
@@ -491,9 +490,12 @@ public class Asteroids extends Game {
     
     public void keyPressed(KeyEvent e){
 		if(e.getKeyCode() == KeyEvent.VK_P){
-			hud.togglePause();
+			if (!hud.getGameOver()) {
+				hud.togglePause();				
+			}
 		}else if(e.getKeyCode() == KeyEvent.VK_R){
 			setNewGame(true);
+			hud.setGameOver(false);
 		}		
     }
 

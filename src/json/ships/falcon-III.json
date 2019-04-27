@@ -1,6 +1,6 @@
 {
-	"MAX_CHARGE":			15,
-	"CHARGE_RATE":			0.025,
+	"MAX_CHARGE":			5,
+	"CHARGE_RATE":			0.010,
 	"STRENGTH":				3,
 	"BULLET_RANGE":			700,
 	"FIRE_DELAY_TIME":		1,

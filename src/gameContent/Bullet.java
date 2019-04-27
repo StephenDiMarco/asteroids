@@ -7,7 +7,6 @@ public class Bullet extends  Circle{
 	private double travelDistancePerFrame;
 	private double xVelocity;
 	private double yVelocity;
-	private double origin;
 
 	public boolean depleted; //Determines whether the bullet should be removed array
 	

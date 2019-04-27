@@ -1,5 +1,4 @@
 package gameContent;
-import java.util.Random;
 
 public class ShipAttributes {
 	
