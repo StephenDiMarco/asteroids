@@ -12,6 +12,8 @@ USAGE: You are intended to instantiate this class with a set of points that
        is the same shape as {(9,10),(10,10),(10,9)}.
 */
 
+import java.awt.geom.Path2D;
+
 class Polygon extends Shape {
   private Point[] shape;   // An array of points.
   public double rotation;  // Zero degrees is due east.
@@ -44,6 +46,7 @@ class Polygon extends Shape {
   public  Point[] getShape(){
 	  return shape;
   }
+  
   // "getPoints" applies the rotation and offset to the shape of the polygon.
   public Point[] getPoints() {
     Point center = findCenter();
@@ -62,6 +65,18 @@ class Polygon extends Shape {
     return points;
   }
   
+  public Path2D.Double getBoundingBoxPath() {
+      Point[] tempPoints = getPoints();
+      //Creating a shape
+      Path2D.Double path = new Path2D.Double();
+      //Creating the first point
+      path.moveTo(tempPoints[0].x, tempPoints[0].y);
+      //Creating the remaining points
+      for (int i = 1; i < tempPoints.length; i++) {
+          path.lineTo(tempPoints[i].x, tempPoints[i].y);
+      }
+      return path;
+  }
 
   
   // "contains" implements some magical math (i.e. the ray-casting algorithm).

@@ -130,21 +130,6 @@ public class Asteroids extends Game {
         }
     }
 
-    /************************************     Shape Creation         *************************************/
-    private Path2D createShape(Polygon polygon) {
-
-        Point[] tempPoints = polygon.getPoints();
-        //Creating a shape
-        Path2D.Double path = new Path2D.Double();
-        //Creating the first point
-        path.moveTo(tempPoints[0].x, tempPoints[0].y);
-        //Creating the remaining points
-        for (int i = 1; i < tempPoints.length; i++) {
-            path.lineTo(tempPoints[i].x, tempPoints[i].y);
-        }
-        return path;
-    }
-
     /************************************     Object Creation         *************************************/
     private void createStars() {
         for (int i = 0; i < NUM_STARS; i++) {
@@ -281,7 +266,7 @@ public class Asteroids extends Game {
         brush.setColor(brown);
         for (int i = 0; i < asteroids.size(); i++) {
             asteroids.get(i).move();
-            brush.fill(createShape(asteroids.get(i)));
+            brush.fill(asteroids.get(i).getBoundingBoxPath());
         }
     }
     
@@ -292,7 +277,7 @@ public class Asteroids extends Game {
             for (int index = 0; index < upgrades.size(); index++) {
 		        if (upgrades.get(index) != null) {
 		            brush.setColor(upgrades.get(index).getColor());
-		            brush.fill(createShape(upgrades.get(index)));
+		            brush.fill(upgrades.get(index).getBoundingBoxPath());
 		            //Decrementing upgrade time
 		            upgrades.get(index).decreaseDuration(elapsedTime);
 		            //Checking if time is depleted
@@ -321,11 +306,11 @@ public class Asteroids extends Game {
         //Updating then drawing ship
         ship.update();
         brush.setColor(Color.red);
-        brush.fill(createShape(ship));
+        brush.fill(ship.getBoundingBoxPath());
         //Adding overshield
         if (ship.hasOvershields()) {
             brush.setColor(Color.white);
-            brush.draw(createShape(ship));
+            brush.draw(ship.getBoundingBoxPath());
         }
         //Updating bullets
         brush.setColor(Color.green);
@@ -340,7 +325,7 @@ public class Asteroids extends Game {
         brush.setColor(Color.magenta);
         for (int i = 0; i < ships.size(); i++) {
             ships.get(i).update();
-            brush.fill(createShape(ships.get(i)));
+            brush.fill(ships.get(i).getBoundingBoxPath());
         }
         //Painting aiBullets
         for (int j = 0; j < aiBullets.size(); j++) {
