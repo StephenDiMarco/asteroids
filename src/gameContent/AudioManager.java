@@ -2,12 +2,14 @@ package gameContent;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.BooleanControl;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class AudioManager {
@@ -25,8 +27,13 @@ public class AudioManager {
 	public String ASTEROID_DESTROYED 	= FX + "asteroid-destroyed.wav";
 	public String UPGRADE_PICKUP	 	= FX + "upgrade-pickup.wav";
 	
+	private Mixer.Info[] infos;
+	private boolean mute;
+	
     public AudioManager() {
     	playLoop(THEME);
+    	infos = AudioSystem.getMixerInfo();
+    	mute = false;
     }
    
     public void playLoop(String fileName) {
@@ -36,16 +43,33 @@ public class AudioManager {
     public void playOnce(String fileName) {
     	loadAudioFile(fileName, ONCE);
     }
-    
-	private void loadAudioFile(String fileName, int mode) {
+ 
+    public void toggleMute() {
+    	mute = !mute;
+    	
+    	for (Mixer.Info info: infos) {
+    	    Mixer mixer = AudioSystem.getMixer(info);
+    	    for(Line line : mixer.getSourceLines()) {
+    		    mute(line);	
+    	    }
+    	}
+    }
+
+    private synchronized void loadAudioFile(String fileName, int mode) {
 		try {
 
 			Clip clip = AudioSystem.getClip();
 			AudioInputStream ais = AudioSystem.getAudioInputStream( new File(path + fileName) );
 			clip.open(ais);
 			clip.loop(mode);
+		    mute(clip);
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		} 	      
+	}
+
+	private void mute(Line line) {
+		BooleanControl muteControl = (BooleanControl) line.getControl(BooleanControl.Type.MUTE);
+		muteControl.setValue(mute);
 	}
 }

@@ -481,7 +481,9 @@ public class Asteroids extends Game {
 		}else if(e.getKeyCode() == KeyEvent.VK_R){
 			setNewGame(true);
 			hud.setGameOver(false);
-		}		
+		}else if(e.getKeyCode() == KeyEvent.VK_M)	 {
+			audioManager.toggleMute();
+		}
     }
 
 }
