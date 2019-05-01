@@ -16,6 +16,7 @@ import java.awt.geom.Path2D;
 
 class Polygon extends Shape {
   private Point[] shape;   // An array of points.
+  private Point[] boundingBox;
   public double rotation;  // Zero degrees is due east.
   private double area; 
   //Do to the formatting of this Polygon object, it requires 
@@ -25,7 +26,10 @@ class Polygon extends Shape {
 	super(inPosition);
     shape = inShape;
     rotation = inRotation;
-    
+    init();
+  }
+  
+  public void init() {
     // First, we find the shape's top-most left-most boundary, its origin.
     Point origin = new Point(shape[0].x,shape[0].y);
     for (Point p : shape) {
@@ -41,32 +45,45 @@ class Polygon extends Shape {
     }
     
     this.area = findArea();
+    boundingBox = this.clone();
+  }
+  
+  public void update() {
+	  updateBoundingBox();
   }
   
   public  Point[] getShape(){
 	  return shape;
   }
   
-  // "getPoints" applies the rotation and offset to the shape of the polygon.
-  public Point[] getPoints() {
+  public Point[] getBoundingBox() {
+	return boundingBox;
+  }
+  
+  public Point[] clone() {
+	  Point[] shapeClone = new Point[shape.length];
+	  for(int i = 0; i < shapeClone.length; i++) {
+		  shapeClone[i] = shape[i].clone();
+	  }
+	  return shapeClone;
+  }
+  
+  private void updateBoundingBox() {
     Point center = findCenter();
-    Point[] points = new Point[shape.length];
     int i = 0;
     for (Point p : shape) {
-      double x = ((p.x-center.x) * Math.cos(Math.toRadians(rotation)))
+    	boundingBox[i].x = ((p.x-center.x) * Math.cos(Math.toRadians(rotation)))
                - ((p.y-center.y) * Math.sin(Math.toRadians(rotation)))
                + center.x/2 + position.x;
-      double y = ((p.x-center.x) * Math.sin(Math.toRadians(rotation)))
+    	boundingBox[i].y = ((p.x-center.x) * Math.sin(Math.toRadians(rotation)))
                + ((p.y-center.y) * Math.cos(Math.toRadians(rotation)))
                + center.y/2 + position.y;
-      points[i] = new Point(x,y);
       i++;
     }
-    return points;
   }
   
   public Path2D.Double getBoundingBoxPath() {
-      Point[] tempPoints = getPoints();
+      Point[] tempPoints = getBoundingBox();
       //Creating a shape
       Path2D.Double path = new Path2D.Double();
       //Creating the first point
@@ -81,7 +98,7 @@ class Polygon extends Shape {
   
   // "contains" implements some magical math (i.e. the ray-casting algorithm).
   public boolean contains(Point point) {
-    Point[] points = getPoints();
+    Point[] points = getBoundingBox();
     double crossingNumber = 0;
     for (int i = 0, j = 1; i < shape.length; i++, j=(j+1)%shape.length) {
       if ((((points[i].x < point.x) && (point.x <= points[j].x)) ||
@@ -98,7 +115,7 @@ class Polygon extends Shape {
   //Checks if one polygon conflicts with another (used for checking if ship hits asteroid)
   public boolean intersect(Polygon otherPolygon){
 	 
-	  Point[] tempPoints = otherPolygon.getPoints();
+	  Point[] tempPoints = otherPolygon.getBoundingBox();
 	  
 	  for(int i = 0; i < tempPoints.length; i++){
 		  //Checks if the intersect

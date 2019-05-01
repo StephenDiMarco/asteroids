@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
 
@@ -265,7 +264,7 @@ public class Asteroids extends Game {
         //Updating then drawing all asteroids in array
         brush.setColor(brown);
         for (int i = 0; i < asteroids.size(); i++) {
-            asteroids.get(i).move();
+            asteroids.get(i).update();
             brush.fill(asteroids.get(i).getBoundingBoxPath());
         }
     }
@@ -277,6 +276,7 @@ public class Asteroids extends Game {
             for (int index = 0; index < upgrades.size(); index++) {
 		        if (upgrades.get(index) != null) {
 		            brush.setColor(upgrades.get(index).getColor());
+		            upgrades.get(index).update();
 		            brush.fill(upgrades.get(index).getBoundingBoxPath());
 		            //Decrementing upgrade time
 		            upgrades.get(index).decreaseDuration(elapsedTime);

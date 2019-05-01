@@ -20,9 +20,9 @@ public class Asteroid extends Polygon{
 		health = 2*level;
 	}
 
-	public void move(){
-		position.x += xVelocity*timeInterval;
-		position.y += yVelocity*timeInterval;
+	public void update(){
+		move();
+		super.update();
 	}
 
 	public void setVelocity(double xVelocity, double yVelocity){
@@ -49,5 +49,10 @@ public class Asteroid extends Polygon{
 	
 	public int getLevel(){
 		return level;
+	}
+	
+	private void move() {
+		position.x += xVelocity*timeInterval;
+		position.y += yVelocity*timeInterval;
 	}
 }

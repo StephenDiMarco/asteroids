@@ -44,7 +44,8 @@ public class UpgradeFactory {
 		
 		Upgrades upgrade = gsonUtility.deserializeFile(upgradePath +  file, Upgrades.class);
 		if(upgrade != null) {
-			upgrade.position = position;		
+			upgrade.position = position;	
+			upgrade.init();
 			return upgrade;		
 		}else {
 			System.out.println("JSON deserialization failed");

@@ -9,4 +9,7 @@ DESCRIPTION: Ah, if only real-life classes were this straight-forward. We'll
 class Point {
   double x,y;
   public Point(double inX, double inY) { x = inX; y = inY; }
+  public Point clone() {
+	return new Point(x, y);
+  }
 }

@@ -88,6 +88,7 @@ public class Ship extends Polygon {
 		 }else if(attributes.FIRE_DELAY > 0){
 			 attributes.FIRE_DELAY -= 0.1;
 		 }
+		 super.update();
 	 }
 	 
 	 
