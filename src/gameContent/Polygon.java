@@ -37,7 +37,6 @@ class Polygon extends Shape {
       if (p.y < origin.y) origin.y = p.y;
     }
 
-    
     // Then, we orient all of its points relative to the real origin.
     for (Point p : shape) {
       p.x -= origin.x;
@@ -51,11 +50,7 @@ class Polygon extends Shape {
   public void update() {
 	  updateBoundingBox();
   }
-  
-  public  Point[] getShape(){
-	  return shape;
-  }
-  
+
   public Point[] getBoundingBox() {
 	return boundingBox;
   }
