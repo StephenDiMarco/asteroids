@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 
 public class Shape {
 	public Point position;

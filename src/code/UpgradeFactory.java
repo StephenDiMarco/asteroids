@@ -1,8 +1,9 @@
-package gameContent;
+package code;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import gameContent.ShipAttributes.ModifiableAttributeTypes;
+
+import code.ShipAttributes.ModifiableAttributeTypes;
 
 public class UpgradeFactory {  	 
 	

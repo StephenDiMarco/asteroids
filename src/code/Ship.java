@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 import java.util.ArrayList;
 
 public class Ship extends Polygon {

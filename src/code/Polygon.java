@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 /*
 CLASS: Polygon
 DESCRIPTION: A polygon is a sequence of points in space defined by a set of

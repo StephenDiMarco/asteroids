@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 
 import java.net.*;
 import java.io.*;

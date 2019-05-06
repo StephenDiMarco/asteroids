@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 /*
 CLASS: Point
 DESCRIPTION: Ah, if only real-life classes were this straight-forward. We'll

@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 
 import java.awt.Color;
 import java.io.BufferedReader;

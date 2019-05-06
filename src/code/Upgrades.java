@@ -1,6 +1,7 @@
-package gameContent;
+package code;
+import static code.ShipAttributes.ModifiableAttributeTypes;
+
 import java.awt.Color;
-import static gameContent.ShipAttributes.ModifiableAttributeTypes;
 
 public class Upgrades extends Polygon{
 	

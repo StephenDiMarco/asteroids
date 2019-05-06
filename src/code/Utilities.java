@@ -1,4 +1,4 @@
-package gameContent;
+package code;
 
 public class Utilities {
 	 public static Polygon CreateObject(double[] shape, Point inPosition, int inRotation){
