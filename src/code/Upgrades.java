@@ -3,9 +3,8 @@ import static code.ShipAttributes.ModifiableAttributeTypes;
 
 import java.awt.Color;
 
-public class Upgrades extends Polygon{
+public class Upgrades extends Polygon {
 	
-	private Color color;
 	private ModifiableAttributeTypes attributeType;
 	private int duration;
 	private float modifier;

@@ -40,7 +40,7 @@ public class GsonUtility {
 	        BufferedReader json;
 			json = new BufferedReader(new FileReader(path + filename));
 	        return gson.fromJson(json, type); 
-		} catch (FileNotFoundException | JsonSyntaxException e) {
+		} catch (FileNotFoundException | JsonSyntaxException | IllegalArgumentException e) {
 			e.printStackTrace(); 
 		    return null;
 		}

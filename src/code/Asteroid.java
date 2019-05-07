@@ -1,6 +1,6 @@
 package code;
 
-public class Asteroid extends Polygon{
+import java.awt.Color;
 	
 	private double xVelocity;
 	private double yVelocity;
@@ -8,8 +8,8 @@ public class Asteroid extends Polygon{
 	private float health;
 	private int level;
 	
-	public Asteroid(Point[] inShape, Point inPosition, int level){
-		super(inShape, inPosition, 0);
+	public Asteroid(Point[] inShape, Point inPosition, int level, Color color){
+		super(inShape, inPosition, 0, color);
 
 		//Randomly setting velocity, as a function of the square of the asteroids level
 		timeInterval = Game.GetTimeInterval();

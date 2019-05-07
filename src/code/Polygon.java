@@ -12,6 +12,7 @@ USAGE: You are intended to instantiate this class with a set of points that
        is the same shape as {(9,10),(10,10),(10,9)}.
 */
 
+import java.awt.Color;
 import java.awt.geom.Path2D;
 
 class Polygon extends Shape {
@@ -19,9 +20,17 @@ class Polygon extends Shape {
   private Point[] boundingBox;
   public double rotation;  // Zero degrees is due east.
   private double area; 
-  //Do to the formatting of this Polygon object, it requires 
-  
 
+  protected Color color;
+
+  public Polygon(Point[] inShape, Point inPosition, double inRotation, Color color) {
+	super(inPosition);
+    shape = inShape;
+    rotation = inRotation;
+    this.color = color;
+    init();
+  }
+  
   public Polygon(Point[] inShape, Point inPosition, double inRotation) {
 	super(inPosition);
     shape = inShape;
