@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import code.GameObjectRegistry.Layers;
+
 import java.awt.image.BufferedImage;
 
 
@@ -19,10 +21,10 @@ public class Asteroids extends Game {
     //Stores game objects
     private Ship ship;
     private ArrayList < Bullet > playerBullets; //Will be used for AIs fire as well
-    private ArrayList < Asteroid > asteroids;
     private ArrayList < Ship > ships;
     private ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
     private ArrayList < Upgrades > upgrades;    
+    private GameObjectRegistry gameObjectRegistry;
     private Star[] stars;
     private Hud hud;
     
@@ -40,8 +42,6 @@ public class Asteroids extends Game {
     //Server Connection
     @SuppressWarnings("unused")
     private ServerConnection serverConnection;
-    //Custom Colors
-    private Color brown = new Color(139, 75, 60);
     
 	public static void main(String[] args)
 	{
@@ -67,6 +67,7 @@ public class Asteroids extends Game {
         this.audioManager = new AudioManager();
 
         //Creating factories
+        this.gameObjectRegistry = new GameObjectRegistry();
         this.gsonUtility = new GsonUtility();
         this.asteroidFactory = new AsteroidFactory();
         this.shipFactory = new ShipFactory(gsonUtility, audioManager);
@@ -82,7 +83,6 @@ public class Asteroids extends Game {
         this.level = 0;
  
         //Creating scene object stores
-        asteroids = new ArrayList < Asteroid > ();
         playerBullets = new ArrayList < Bullet > ();
         this.ship = shipFactory.createPlayerShip(new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), playerBullets);
         this.ship.lives = 3;
@@ -111,7 +111,9 @@ public class Asteroids extends Game {
             updateShip(brush);
             updateAIShip(brush);
             updateUpgrade(brush);
-            updateAsteriods(brush);
+            gameObjectRegistry.update();
+            gameObjectRegistry.clean();
+            gameObjectRegistry.paint(brush);
             hud.update(brush);
 
             //Collision detection
@@ -184,50 +186,6 @@ public class Asteroids extends Game {
 
         }
 
-        //Checking if Asteroids have been hit by bullets, the player or are out of bounds
-        for (int i = 0; i < asteroids.size(); i++) {
-            //Checking all bullets to see if they overlap with the asteroid
-            for (int j = 0; j < playerBullets.size(); j++) {
-                if (asteroids.get(i).contains(playerBullets.get(j).position)) {
-                    //Checking if health is depleted
-                    boolean destroyed = asteroids.get(i).hit(playerBullets.get(j).getStrength());
-                    //Destroying bullet
-                    playerBullets.get(j).depleted = true;
-                    //Asteroid has been destroyed
-                    if (destroyed) {
-                        destroyAsteriod(i);
-                        break;
-                    }
-                }
-
-            }
-            //Destroyed Asteroids will not be checked.
-            if (asteroids.size() != i) {
-                //In case shot destroys asteroid as it just before collision.
-                //Checking if the ship has been hit.
-                if (asteroids.get(i).intersect(ship)) {
-                    //Destroying Asteroid
-                    destroyAsteriod(i);
-                    if (!ship.hasOvershields()) {
-                        killPlayer();
-                    }
-                    break;
-                }
-                //Checking if it is out of bounds
-                isOutOfBounds(asteroids.get(i));
-
-                for (int j = 0; j < ships.size(); j++) {
-                    //Checking if the ship has been hit.
-                    if (asteroids.get(i).intersect(ships.get(j))) {
-                        //Destroying Asteroid
-                        destroyAsteriod(i);
-                        destroyShip(j);
-                        break;
-                    }
-                }
-            }
-        }
-
         //AI Ship Collision Check
         for (int i = 0; i < ships.size(); i++) {
             isOutOfBounds(ships.get(i));
@@ -258,15 +216,6 @@ public class Asteroids extends Game {
     private void updateBackground(Graphics2D brush) {
         brush.setColor(Color.black);
         brush.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    }
-    
-    private void updateAsteriods(Graphics2D brush) {
-        //Updating then drawing all asteroids in array
-        brush.setColor(brown);
-        for (int i = 0; i < asteroids.size(); i++) {
-            asteroids.get(i).update();
-            brush.fill(asteroids.get(i).getBoundingBoxPath());
-        }
     }
     
     //Makes checks and paints images
@@ -355,32 +304,13 @@ public class Asteroids extends Game {
         return new Point(x, y);
     }
     
-    /***********  Asteroid Variables     **********/
-    static protected float ASTEROID_DROP_CHANCE = 0.10f;
-    static protected int ASTEROID_BASE_SCORE = 20;
-
-    private void destroyAsteriod(int index) {
-        hud.updateScore(ASTEROID_BASE_SCORE * asteroids.get(index).getLevel(), asteroids.get(index).position);
-        
-        //Breaking asteroid down into new asteroids
-        if (asteroids.get(index).getLevel() >= 2) {
-            asteroids.addAll(asteroidFactory.splitAsteroid(asteroids.get(index)));
-        } else {
-            if (Math.random() <= ASTEROID_DROP_CHANCE) {
-            	addUpgradeToScene(asteroids.get(index).position);
-            }
-        }
-        audioManager.playOnce(audioManager.ASTEROID_DESTROYED);
-        asteroids.remove(index);
-    }
-
     static protected int SHIP_DROP_CHANCE = 2;
 
     private void destroyShip(int index) {
     	hud.updateScore(ships.get(index).score(), ships.get(index).position);
 
         //Chance item drop
-        if (ASTEROID_DROP_CHANCE * Math.random() > ASTEROID_DROP_CHANCE - 1) {
+        if (SHIP_DROP_CHANCE * Math.random() > SHIP_DROP_CHANCE - 1) {
         	addUpgradeToScene(ships.get(index).position);
         }
         audioManager.playOnce(audioManager.SHIP_DESTROYED);
@@ -399,7 +329,7 @@ public class Asteroids extends Game {
     //Checks various game state properties and makes appropriate calls
     private void gameStatus() {
         //Checking if level is complete
-        if (asteroids.size() + ships.size() == 0) {
+        if (gameObjectRegistry.getLayerSize(Layers.PASSIVE_HOSTILE) + gameObjectRegistry.getLayerSize(Layers.ACTIVE_HOSTILE) == 0) {
             //Resetting player for new level
             resetPlayer();
             //Starting a new level
@@ -457,13 +387,13 @@ public class Asteroids extends Game {
     
 	public void createAiShips(int numShips, String type) {
         for (int i = 0; i < numShips; i++) {
-            ships.add((Ship) shipFactory.createAiShip(findLocation(), type, ship, asteroids, aiBullets));
+            ships.add((Ship) shipFactory.createAiShip(findLocation(), type, ship, new ArrayList<Asteroid>(), aiBullets));
         }
 	}
 	
 	public void createAsteroids(int numAsteroids, int level) {
         for (int i = 0; i < numAsteroids; i++) {
-            asteroids.add(asteroidFactory.createAsteroid(findLocation(), level));
+        	gameObjectRegistry.register(asteroidFactory.createAsteroid(findLocation(), level), Layers.PASSIVE_HOSTILE);
         }
 	}
 	

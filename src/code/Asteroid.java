@@ -1,12 +1,16 @@
 package code;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+
+public class Asteroid extends Polygon implements GameObject {
 	
 	private double xVelocity;
 	private double yVelocity;
 	private double timeInterval;
 	private float health;
 	private int level;
+	private boolean alive;
 	
 	public Asteroid(Point[] inShape, Point inPosition, int level, Color color){
 		super(inShape, inPosition, 0, color);
@@ -15,14 +19,25 @@ import java.awt.Color;
 		timeInterval = Game.GetTimeInterval();
 		double sqrdLevel = Math.sqrt(level);
 		setVelocity(sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()),sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()));
+		
 		//Setting health dependent on level
 		this.level = level;
 		health = 2*level;
+		alive = true;
 	}
 
-	public void update(){
+	public void update() {
 		move();
 		super.update();
+	}
+	
+	public boolean alive() {
+		return alive;
+	}
+	
+	public void paint(Graphics2D brush) {
+        brush.setColor(color);
+        brush.fill(getBoundingBoxPath());
 	}
 
 	public void setVelocity(double xVelocity, double yVelocity){
