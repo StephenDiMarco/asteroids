@@ -7,21 +7,31 @@ import java.util.Iterator;
 
 public class GameObjectRegistry {
 	
-	HashMap<Layers, ArrayList<GameObject>> gameObjects;
+	private HashMap<Layers, ArrayList<GameObject>> gameObjects;
 	
-	enum Layers {
-	  PASSIVE_HOSTILE,
-	  ACTIVE_HOSTILE,
-	  PASSIVE_FRIENDLY,
-	  ACTIVE_FRIENDLY
+	public enum Layers {
+	  PASSIVE_HOSTILE,    // Asteroids
+	  ACTIVE_HOSTILE,     // Enemy ships, enemy bullets
+	  PASSIVE_FRIENDLY,   // Upgrades
+	  ACTIVE_FRIENDLY     // Player ship, drones
 	}
 	
+	private static HashMap<Layers, Layers[]> collisionMap;
+	
 	public GameObjectRegistry() {
-		gameObjects = new HashMap<Layers, ArrayList<GameObject>>();	
+		gameObjects = new HashMap<Layers, ArrayList<GameObject>>();
+		initializeCollisionMap();
 		for (Layers layer : Layers.values()) { 
 			gameObjects.put(layer, new ArrayList<GameObject>()); 
 		}
 	}
+	
+	private void initializeCollisionMap() {
+		collisionMap.put(Layers.ACTIVE_FRIENDLY, new Layers[] {Layers.PASSIVE_HOSTILE, Layers.ACTIVE_HOSTILE});
+		collisionMap.put(Layers.ACTIVE_HOSTILE, new Layers[] {Layers.PASSIVE_HOSTILE, Layers.ACTIVE_FRIENDLY});
+		collisionMap.put(Layers.PASSIVE_HOSTILE, new Layers[] {Layers.PASSIVE_HOSTILE, Layers.ACTIVE_HOSTILE, Layers.PASSIVE_FRIENDLY});
+	}
+
 	
 	public int getLayerSize(Layers layer) {
 		return gameObjects.get(layer).size();
