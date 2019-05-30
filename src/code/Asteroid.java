@@ -1,14 +1,16 @@
 package code;
 
 import java.awt.Color;
-	
+
+public class Asteroid extends Polygon {
+
 	private double xVelocity;
 	private double yVelocity;
 	private double timeInterval;
 	private float health;
 	private int level;
 	
-	public Asteroid(Point[] inShape, Point inPosition, int level, Color color){
+	public Asteroid(Point[] inShape, Point inPosition, int level, Color color) {
 		super(inShape, inPosition, 0, color);
 
 		//Randomly setting velocity, as a function of the square of the asteroids level
