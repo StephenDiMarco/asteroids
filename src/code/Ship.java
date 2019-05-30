@@ -1,10 +1,14 @@
 package code;
+import java.awt.Color;
 import java.util.ArrayList;
+
+import code.GameObjectRegistry.Layers;
 
 public class Ship extends Polygon {
     private Controller controller;
+    private GameObjectRegistry gameObjectRegistry;
+    private Layers layer;
 	//Weapon attributes, all accessible fields
-	protected ArrayList<Bullet> bullets;         //Will be used for AIs fire as well
     private ShipAttributes attributes;
 	public int lives;
 
@@ -18,15 +22,16 @@ public class Ship extends Polygon {
 	private String weaponSound;
 	
 	/************************************** Constructors ****************************************/
-	public Ship(Point[] inShape, Point inPosition,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes, AudioManager audioManager, String weaponSound){
-		super(inShape, inPosition, 0);
+	public Ship(Point[] inShape, Point inPosition, Layers layer, Controller controller, ShipAttributes attributes, AudioManager audioManager, String weaponSound, Color color, GameObjectRegistry gameObjectRegistry){
+		super(inShape, inPosition, 0, color);
 		//Setting time interval
 		timeInterval = Game.GetTimeInterval();
-		this.bullets = bullets;
 		this.controller = controller;
 		this.attributes = attributes;
 		this.audioManager = audioManager;
 		this.weaponSound = weaponSound;
+		this.gameObjectRegistry = gameObjectRegistry;
+		this.layer = layer;
 	}
 
 	/************************************** Getter Methods ****************************************/
@@ -148,7 +153,7 @@ public class Ship extends Polygon {
 	 private void fire(){
 		if(attributes.CHARGE > 0){
 			audioManager.playOnce(weaponSound);
-			bullets.add( new Bullet(position.x, position.y, (int)Math.round(attributes.STRENGTH), attributes.STRENGTH, timeInterval, rotation, attributes.BULLET_RANGE, getXVel(), getYVel()));
+			gameObjectRegistry.register(new Bullet(position.x, position.y, (int)Math.round(attributes.STRENGTH), (int)attributes.STRENGTH, timeInterval, rotation, attributes.BULLET_RANGE, getXVel(), getYVel(), color), layer);
 			//Decrementing the charge	
 			attributes.CHARGE--;
 			//Adding delay to next shot

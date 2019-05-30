@@ -27,6 +27,7 @@ public class GameObjectRegistry {
 	}
 	
 	private void initializeCollisionMap() {
+		collisionMap = new HashMap<Layers, Layers[]>();
 		collisionMap.put(Layers.ACTIVE_FRIENDLY, new Layers[] {Layers.PASSIVE_HOSTILE, Layers.ACTIVE_HOSTILE});
 		collisionMap.put(Layers.ACTIVE_HOSTILE, new Layers[] {Layers.PASSIVE_HOSTILE, Layers.ACTIVE_FRIENDLY});
 		collisionMap.put(Layers.PASSIVE_HOSTILE, new Layers[] {Layers.PASSIVE_HOSTILE, Layers.ACTIVE_HOSTILE, Layers.PASSIVE_FRIENDLY});
@@ -43,8 +44,26 @@ public class GameObjectRegistry {
 	
 	public void update() {
 		for (ArrayList<GameObject> gameObjectLayer : gameObjects.values()) {
-			for(GameObject gameObject : gameObjectLayer){
-			    gameObject.update();
+ 			for(GameObject gameObject : gameObjectLayer){
+ 				gameObject.update();
+			}
+		}
+	}
+	
+	public void checkCollisions() {
+		for (Layers activeLayer : gameObjects.keySet()) {
+			checkCollisionOnLayer(activeLayer);
+		}	
+	}
+
+	private void checkCollisionOnLayer(Layers activeLayer) {
+		for(Layers targetLayer : collisionMap.get(activeLayer)) {
+			for(GameObject activeObject : gameObjects.get(activeLayer)){
+				for(GameObject targetObject : gameObjects.get(targetLayer)){
+					if() {
+						activeObject.onCollision(targetObject);						
+					}
+				}
 			}
 		}
 	}

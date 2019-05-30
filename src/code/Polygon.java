@@ -19,7 +19,7 @@ class Polygon extends Shape {
   private Point[] shape;   // An array of points.
   private Point[] boundingBox;
   public double rotation;  // Zero degrees is due east.
-  private double area; 
+  protected double area; 
 
   protected Color color;
 

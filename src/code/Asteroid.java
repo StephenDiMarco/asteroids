@@ -39,6 +39,17 @@ public class Asteroid extends Polygon implements GameObject {
         brush.setColor(color);
         brush.fill(getBoundingBoxPath());
 	}
+	
+	public void onCollision(GameObject object) {
+		health -= object.getDamage();
+		if(health <= 0) {
+			alive = false;
+		}
+	}
+	
+	public int getDamage() {
+		return (int)area * getVelocity();
+	}
 
 	public void setVelocity(double xVelocity, double yVelocity){
 		this.xVelocity = xVelocity;
@@ -69,5 +80,9 @@ public class Asteroid extends Polygon implements GameObject {
 	private void move() {
 		position.x += xVelocity*timeInterval;
 		position.y += yVelocity*timeInterval;
+	}
+	
+	private int getVelocity() {
+		return (int)Math.sqrt(xVelocity*xVelocity + yVelocity*yVelocity);
 	}
 }

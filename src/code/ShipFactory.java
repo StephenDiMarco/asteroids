@@ -1,10 +1,14 @@
 package code;
 
+import java.awt.Color;
 import java.util.ArrayList;
+
+import code.GameObjectRegistry.Layers;
 
 public class ShipFactory {  	 
 	
 	private GsonUtility gsonUtility;
+	private GameObjectRegistry gameObjectRegistry;
 	private AudioManager audioManager;
 	private static String shipPath = "ships/";
 	
@@ -20,23 +24,24 @@ public class ShipFactory {
 	protected double[] SHIP_SHAPE = {10,-19, 9.25,-19, 7,-5.5, 0,-3, 0,0, 7,0, 7,3, 9,3, 9,0, 
 			 							11,0, 11,3, 13,3, 13,0, 20,0, 20,-3, 13,-5.5, 10.75,-19};
 	
-	public ShipFactory(GsonUtility gsonUtility, AudioManager audioManager) {
+	public ShipFactory(GsonUtility gsonUtility, AudioManager audioManager, GameObjectRegistry gameObjectRegistry) {
 		this.gsonUtility = gsonUtility;
 		this.audioManager = audioManager;
+		this.gameObjectRegistry = gameObjectRegistry;
 	}
 
 	public Ship createPlayerShip(Point inPosition, ArrayList<Bullet> playerBullets) {
         Polygon shipShape = Utilities.CreateObject(SHIP_SHAPE, inPosition, 0);
         PlayerController controller = new PlayerController();
         ShipAttributes attributes = gsonUtility.deserializeFile(shipPath + "sparrow.json", ShipAttributes.class);
-        return new Ship(shipShape.clone(), shipShape.position, playerBullets, controller, attributes, audioManager, audioManager.PLAYER_WEAPON);
+        return new Ship(shipShape.clone(), shipShape.position, Layers.ACTIVE_FRIENDLY, controller, attributes, audioManager, audioManager.PLAYER_WEAPON, Color.GREEN, gameObjectRegistry);
 	}
 	
     public Ship createAiShip(Point inPosition, String shipType, Ship target, ArrayList<Asteroid> asteroids, ArrayList<Bullet> aiBullets) {
     	Polygon shipShape = Utilities.CreateObject(ALIEN_SHIP_SHAPE, inPosition, 0);
         AiController aiController = new AiController(target, asteroids);
         ShipAttributes attributes = gsonUtility.deserializeFile(shipPath + shipType, ShipAttributes.class);
-        Ship ship = new Ship(shipShape.clone(), shipShape.position, aiBullets, aiController, attributes, audioManager, audioManager.ENEMY_WEAPON);
+        Ship ship = new Ship(shipShape.clone(), shipShape.position, Layers.ACTIVE_HOSTILE, aiController, attributes, audioManager, audioManager.ENEMY_WEAPON, Color.PINK, gameObjectRegistry);
         AiController shipController = (AiController)ship.getController();
         shipController.setShip(ship);
         return ship;	    

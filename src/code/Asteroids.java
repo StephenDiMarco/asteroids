@@ -70,7 +70,7 @@ public class Asteroids extends Game {
         this.gameObjectRegistry = new GameObjectRegistry();
         this.gsonUtility = new GsonUtility();
         this.asteroidFactory = new AsteroidFactory();
-        this.shipFactory = new ShipFactory(gsonUtility, audioManager);
+        this.shipFactory = new ShipFactory(gsonUtility, audioManager, gameObjectRegistry);
         this.upgradeFactory = new UpgradeFactory(gsonUtility);
         
         newGame();
@@ -156,36 +156,6 @@ public class Asteroids extends Game {
             } 
         }
 
-        //Checking if bullets are out of bounds or are depleted.
-        for (int i = playerBullets.size() - 1; i >= 0; i--) {
-            //Checking if shot is depleted or out of bounds
-            if (playerBullets.get(i).depleted) {
-                playerBullets.remove(i);
-            } else {
-                isOutOfBounds(playerBullets.get(i));
-            }
-        }
-
-        //Checking enemy bullets for depletion or collision
-        for (int i = aiBullets.size() - 1; i >= 0; i--) {
-            //Checking if shot is depleted or out of bounds
-            if (aiBullets.get(i).depleted) {
-                aiBullets.remove(i);
-                //Checking player ship for collision
-            } else if (ship.contains(aiBullets.get(i).position)) {
-                //Checking for overshields, then hitting ship and checking for death
-                if (!ship.hasOvershields()) {
-                    if (ship.hit(aiBullets.get(i).getStrength()) < 0) {
-                        killPlayer();
-                    }
-                }
-                aiBullets.remove(i);
-            } else {
-                isOutOfBounds(aiBullets.get(i));
-            }
-
-        }
-
         //AI Ship Collision Check
         for (int i = 0; i < ships.size(); i++) {
             isOutOfBounds(ships.get(i));
@@ -260,13 +230,6 @@ public class Asteroids extends Game {
         if (ship.hasOvershields()) {
             brush.setColor(Color.white);
             brush.draw(ship.getBoundingBoxPath());
-        }
-        //Updating bullets
-        brush.setColor(Color.green);
-        //Painting bullets
-        for (int i = 0; i < ship.bullets.size(); i++) {
-            ship.bullets.get(i).move();
-            brush.fillOval((int) ship.bullets.get(i).position.x, (int) ship.bullets.get(i).position.y, ship.bullets.get(i).getRadius(), ship.bullets.get(i).getRadius());
         }
     }
 

@@ -8,6 +8,7 @@ import code.ShipAttributes.ModifiableAttributeTypes;
 public class UpgradeFactory {  	 
 	
 	private GsonUtility gsonUtility;
+    private GameObjectRegistry gameObjectRegistry;
 	private static String upgradePath = "upgrades/";
 	private static String upgradeFile = upgradePath + "upgrades.json";
 	
