@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import code.GameObjectRegistry.Layers;
+
 import java.awt.image.BufferedImage;
 
 
@@ -23,7 +25,7 @@ public class Asteroids extends Game {
     private ArrayList < Ship > ships;
     private ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
     private ArrayList < Upgrades > upgrades;    
-    private ArrayList < Debris > debris;    
+    private GameObjectRegistry gameObjectRegistry;
     private Star[] stars;
     private Hud hud;
     
@@ -73,7 +75,7 @@ public class Asteroids extends Game {
         this.asteroidFactory = new AsteroidFactory();
         this.shipFactory = new ShipFactory(gsonUtility, audioManager);
         this.upgradeFactory = new UpgradeFactory(gsonUtility);
-        this.debrisFactory = new DebrisFactory();
+        this.debrisFactory = new DebrisFactory(audioManager);
         
         newGame();
         //Setting updateThread to false to begin;
@@ -85,6 +87,7 @@ public class Asteroids extends Game {
         this.level = 0;
  
         //Creating scene object stores
+        gameObjectRegistry = new GameObjectRegistry();
         asteroids = new ArrayList < Asteroid > ();
         playerBullets = new ArrayList < Bullet > ();
         this.ship = shipFactory.createPlayerShip(new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), playerBullets);
@@ -93,7 +96,6 @@ public class Asteroids extends Game {
         aiBullets = new ArrayList < Bullet > ();
         ships = new ArrayList < Ship > ();
         upgrades = new ArrayList < Upgrades > ();
-        debris = new ArrayList < Debris > ();
         stars = new Star[NUM_STARS];
         hud = new Hud(SCREEN_WIDTH, SCREEN_HEIGHT, ship);
         hud.setPause(false);
@@ -116,7 +118,10 @@ public class Asteroids extends Game {
             updateAIShip(brush);
             updateUpgrade(brush);
             updateAsteriods(brush);
-            updateDebris(brush);
+            gameObjectRegistry.update();
+            gameObjectRegistry.checkCollisions();
+            gameObjectRegistry.clean();
+            gameObjectRegistry.paint(brush);
             hud.update(brush);
 
             //Collision detection
@@ -272,12 +277,6 @@ public class Asteroids extends Game {
             asteroids.get(i).update();
             brush.fill(asteroids.get(i).getBoundingBoxPath());
         }
-    }
-    
-    private void updateDebris(Graphics2D brush) {
-        for (int i = 0; i < debris.size(); i++) {
-        	debris.get(i).update(brush);
-        }	
     }
     
     //Makes checks and paints images
@@ -439,6 +438,9 @@ public class Asteroids extends Game {
     private int POINTS_PER_LEVEL = 50;
 
     private void newLevel() {
+    	//Clearing level
+    	gameObjectRegistry.resetNonPlayerGameObjects();
+
         //Increasing level and lives
         level++;
         ship.lives++;
@@ -464,15 +466,22 @@ public class Asteroids extends Game {
             createAiShips(level, "falcon-I.json");
             createAiShips(level, "falcon-II.json");
         }
-        createDebris(15);
+        // Creating objects in new system
+        createPassiveDebris(55);
+        createHostileDebris(55);
     }
     
-	public void createDebris(int numDebris) {
+	public void createPassiveDebris(int numDebris) {
         for (int i = 0; i < numDebris; i++) {
-            debris.add((Debris) debrisFactory.createDebris(findLocation()));
+            gameObjectRegistry.register(debrisFactory.createDebris(findLocation()), Layers.PASSIVE_FRIENDLY);
         }
 	}
 	
+	public void createHostileDebris(int numDebris) {
+        for (int i = 0; i < numDebris; i++) {
+            gameObjectRegistry.register(debrisFactory.createDebris(findLocation()), Layers.PASSIVE_HOSTILE);
+        }
+	}
     
 	public void createAiShips(int numShips, String type) {
         for (int i = 0; i < numShips; i++) {

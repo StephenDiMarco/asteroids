@@ -4,7 +4,7 @@ import java.awt.Color;
 
 public class DebrisFactory {
 	
-    private int BASE_RADIUS = 3;
+    private int BASE_RADIUS = 10;
     private int RADIUS_MOD = 3;
     private int RADIUS_MOD_VARIANCE = 2;
     
@@ -14,8 +14,10 @@ public class DebrisFactory {
 	private float VEL_CONST = 0.15f;
 	
 	private Pallet greys;
+	private AudioManager audioManager;
 	
-	public DebrisFactory() {
+	public DebrisFactory(AudioManager audioManager) {
+		this.audioManager = audioManager;
 		greys = new Pallet(new Color(89, 115, 100));
 	}
 	
@@ -37,6 +39,6 @@ public class DebrisFactory {
 		Collider collider = new Collider(transform, shape);
 		ColliderSprite sprite = new ColliderSprite(collider, greys.getRandomColor());
 		
-        return new Debris(transform, collider, sprite);
+        return new Debris(transform, collider, sprite, audioManager);
     }
 }

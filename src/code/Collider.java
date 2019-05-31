@@ -1,6 +1,7 @@
 package code;
 
 import java.awt.geom.Path2D;
+import java.util.function.Consumer;
 
 public class Collider {
 
@@ -8,6 +9,7 @@ public class Collider {
     private Point[] shape;
     private Point[] boundingBox;
     private double area; 
+    private Consumer<ColliderSpriteGameObject> callback;
     
 	public Collider(Transform transform, Point[] inShape) {
 		this.transform = transform;
@@ -31,6 +33,14 @@ public class Collider {
 
         this.area = findArea();
         boundingBox = this.clone();
+    }
+    
+    public void setCallback(Consumer<ColliderSpriteGameObject> callback) {
+    	this.callback = callback;
+    }
+    
+    public void onCollision(ColliderSpriteGameObject target) {
+    	callback.accept(target);
     }
 
     public void update() {
@@ -92,12 +102,19 @@ public class Collider {
         return crossingNumber % 2 == 1;
     }
 
-
     //Checks if one polygon conflicts with another (used for checking if ship hits asteroid)
     public boolean intersect(Polygon otherPolygon) {
-
         Point[] tempPoints = otherPolygon.getBoundingBox();
-
+        return intersect(tempPoints);
+    }
+    
+    public boolean intersect(Collider collider) {
+        Point[] tempPoints = collider.getBoundingBox();
+        return intersect(tempPoints);
+    }
+    
+    public boolean intersect(Point[] tempPoints) {
+    
         for (int i = 0; i < tempPoints.length; i++) {
             //Checks if the intersect
             if (this.contains(tempPoints[i])) {

@@ -1,8 +1,23 @@
 package code;
 
-public class Debris extends GameObject {
+import java.util.function.Consumer;
 
-	public Debris(Transform transform, Collider collider, ColliderSprite sprite) {
+public class Debris extends ColliderSpriteGameObject {
+
+	private AudioManager audioManager;
+	
+	public Debris(Transform transform, Collider collider, ColliderSprite sprite, AudioManager audioManager) {
 		super(transform, collider, sprite);
+	    Consumer<ColliderSpriteGameObject> onCollision = (ColliderSpriteGameObject t) -> onCollision(t);
+		collider.setCallback(onCollision);
+		this.audioManager = audioManager;
+	}
+	
+	public void onCollision(ColliderSpriteGameObject target) {
+		alive = false;
+	}
+	
+	public void onDeath() {
+		audioManager.playOnce(audioManager.ASTEROID_DESTROYED);
 	}
 }

@@ -1,6 +1,8 @@
 package code;
 
 import java.awt.Color;
+
+public class Asteroid extends Polygon {
 	
 	private double xVelocity;
 	private double yVelocity;
