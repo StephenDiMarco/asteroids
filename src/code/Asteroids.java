@@ -23,6 +23,7 @@ public class Asteroids extends Game {
     private ArrayList < Ship > ships;
     private ArrayList < Bullet > aiBullets; //Will be used for AIs fire as well
     private ArrayList < Upgrades > upgrades;    
+    private ArrayList < Debris > debris;    
     private Star[] stars;
     private Hud hud;
     
@@ -34,6 +35,7 @@ public class Asteroids extends Game {
     private AsteroidFactory asteroidFactory;
     private ShipFactory shipFactory;
     private UpgradeFactory upgradeFactory;
+    private DebrisFactory debrisFactory;
 
     //Stats
     private int level;
@@ -71,6 +73,7 @@ public class Asteroids extends Game {
         this.asteroidFactory = new AsteroidFactory();
         this.shipFactory = new ShipFactory(gsonUtility, audioManager);
         this.upgradeFactory = new UpgradeFactory(gsonUtility);
+        this.debrisFactory = new DebrisFactory();
         
         newGame();
         //Setting updateThread to false to begin;
@@ -90,6 +93,7 @@ public class Asteroids extends Game {
         aiBullets = new ArrayList < Bullet > ();
         ships = new ArrayList < Ship > ();
         upgrades = new ArrayList < Upgrades > ();
+        debris = new ArrayList < Debris > ();
         stars = new Star[NUM_STARS];
         hud = new Hud(SCREEN_WIDTH, SCREEN_HEIGHT, ship);
         hud.setPause(false);
@@ -112,6 +116,7 @@ public class Asteroids extends Game {
             updateAIShip(brush);
             updateUpgrade(brush);
             updateAsteriods(brush);
+            updateDebris(brush);
             hud.update(brush);
 
             //Collision detection
@@ -267,6 +272,12 @@ public class Asteroids extends Game {
             asteroids.get(i).update();
             brush.fill(asteroids.get(i).getBoundingBoxPath());
         }
+    }
+    
+    private void updateDebris(Graphics2D brush) {
+        for (int i = 0; i < debris.size(); i++) {
+        	debris.get(i).update(brush);
+        }	
     }
     
     //Makes checks and paints images
@@ -453,7 +464,15 @@ public class Asteroids extends Game {
             createAiShips(level, "falcon-I.json");
             createAiShips(level, "falcon-II.json");
         }
+        createDebris(15);
     }
+    
+	public void createDebris(int numDebris) {
+        for (int i = 0; i < numDebris; i++) {
+            debris.add((Debris) debrisFactory.createDebris(findLocation()));
+        }
+	}
+	
     
 	public void createAiShips(int numShips, String type) {
         for (int i = 0; i < numShips; i++) {
