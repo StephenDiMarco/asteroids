@@ -16,6 +16,14 @@ public class ColliderSpriteGameObject implements GameObject {
 		this.alive = true;
 	}
 	
+	public Transform getTransform() {
+		return transform;
+	}
+	
+	public ColliderSprite getSprite() {
+		return sprite;
+	}
+	
 	public boolean isAlive() {
 		return alive;
 	}

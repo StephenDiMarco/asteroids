@@ -34,7 +34,7 @@ public class AiController extends Controller {
 		int asteroidIndex = asteroidsInRange();
 		
 		if(asteroidIndex > -1){
-			avoid(asteroids.get(asteroidIndex).position);
+			avoid(asteroids.get(asteroidIndex).getTransform().getPosition());
 		}else{
 			track();
 		}
@@ -132,7 +132,7 @@ public class AiController extends Controller {
 		int index = -1;
 		
 		for(int i = 0; i < asteroids.size(); i++){
-			distance = getDistance(asteroids.get(i).position);
+			distance = getDistance(asteroids.get(i).getTransform().getPosition());
 			if(distance < minDistance){
 				minDistance = distance;
 				index = i;

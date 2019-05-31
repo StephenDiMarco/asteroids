@@ -1,60 +1,52 @@
 package code;
 
 import java.awt.Color;
+import java.util.function.Consumer;
 
-public class Asteroid extends Polygon {
-	
-	private double xVelocity;
-	private double yVelocity;
-	private double timeInterval;
+public class Asteroid extends ColliderSpriteGameObject {
+
+	private AudioManager audioManager;
+
 	private float health;
 	private int level;
 	
-	public Asteroid(Point[] inShape, Point inPosition, int level, Color color){
-		super(inShape, inPosition, 0, color);
+	public Asteroid(Transform transform, Collider collider, ColliderSprite sprite, AudioManager audioManager, int level) {
+		super(transform, collider, sprite);
+	    Consumer<ColliderSpriteGameObject> onCollision = (ColliderSpriteGameObject t) -> this.onCollision(t);
+		collider.setCallback(onCollision);
+		this.audioManager = audioManager;
 
-		//Randomly setting velocity, as a function of the square of the asteroids level
-		timeInterval = Game.GetTimeInterval();
-		double sqrdLevel = Math.sqrt(level);
-		setVelocity(sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()),sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()));
 		//Setting health dependent on level
 		this.level = level;
 		health = 2*level;
 	}
 
-	public void update(){
-		move();
-		super.update();
-	}
-
-	public void setVelocity(double xVelocity, double yVelocity){
-		this.xVelocity = xVelocity;
-		this.yVelocity = yVelocity;
-	}
-
-	public double getXvel(){
-		return xVelocity;
-	}
-	
-	public double getYvel(){
-		return yVelocity;
-	}
-	
-	public boolean hit(float attack){
-		health -= attack;
+	public void onCollision(ColliderSpriteGameObject target){
+		health -= 5;
 		if(health <= 0){
-			return true;
-		}else{
-			return false;
+			alive = false;
 		}
+	}
+
+    static protected int ASTEROID_BASE_SCORE = 20;
+    static protected float ASTEROID_DROP_CHANCE = 0.10f;
+	
+	public void onDeath() {
+		audioManager.playOnce(audioManager.ASTEROID_DESTROYED);    
+
+	//	hud.updateScore(ASTEROID_BASE_SCORE * asteroids.get(index).getLevel(), asteroids.get(index).position);
+        
+    //    //Breaking asteroid down into new asteroids
+    //    if (asteroids.get(index).getLevel() >= 2) {
+    //        asteroids.addAll(asteroidFactory.splitAsteroid(asteroids.get(index)));
+    //    } else {
+    //        if (Math.random() <= ASTEROID_DROP_CHANCE) {
+    //        	addUpgradeToScene(asteroids.get(index).position);
+    //        }
+    //    }
 	}
 	
 	public int getLevel(){
 		return level;
-	}
-	
-	private void move() {
-		position.x += xVelocity*timeInterval;
-		position.y += yVelocity*timeInterval;
 	}
 }

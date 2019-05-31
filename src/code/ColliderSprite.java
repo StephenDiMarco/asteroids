@@ -13,6 +13,10 @@ public class ColliderSprite {
 		this.color = color;
 	}
 	
+	public Color getColor() {
+		return color;
+	}
+	
 	public void paint(Graphics2D brush) {
         brush.setColor(color);
         brush.fill(collider.getBoundingBoxPath());
