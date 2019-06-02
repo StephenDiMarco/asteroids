@@ -41,20 +41,39 @@ public class Transform {
 		this.yVelocity = yVelocity;
 	}
 	
-	public double getVelocity(double xVelocity, double yVelocity){
+	public double getVelocity(){
 		return Math.sqrt(xVelocity*xVelocity + yVelocity*yVelocity);
 	}
 	
-	protected void rotate(double degrees) {
-	 rotation = (rotation+degrees)%360;
-	 if( rotation <= 0 ){
-	  rotation = 360 - rotation;
+
+	 protected void rotate(double angularVelocity){
+		 rotateByDegree(angularVelocity*timeInterval);
 	 }
-	}  
 	
-	public void move() {
+	 protected void rotateByDegree(double degrees) {
+	     rotation = (rotation+degrees)%360;
+	     if( rotation <= 0 ){
+	    	 rotation = 360 - rotation;
+	     }
+	 }
+	
+	 public void accelerate (double acceleration, double MaxVelocity) {
+		 double dvx = (acceleration * Math.sin(Math.toRadians(rotation)));
+		 double dvy = (acceleration * -Math.cos(Math.toRadians(rotation)));
+		 xVelocity += dvx;
+		 yVelocity += dvy;
+		 if(getVelocity() > MaxVelocity ) {
+			 double theta = -Math.atan2(xVelocity, yVelocity);
+			 theta += Math.PI;
+			 theta = Math.toDegrees(theta);
+			 xVelocity = (MaxVelocity * Math.sin(Math.toRadians(theta)));
+			 yVelocity = (MaxVelocity * -Math.cos(Math.toRadians(theta)));
+		 }
+	 }
+	
+	public void update() {
 		position.x += xVelocity*timeInterval;
 		position.y += yVelocity*timeInterval;
+		Asteroids.isOutOfBounds(position);
 	}
-
 }

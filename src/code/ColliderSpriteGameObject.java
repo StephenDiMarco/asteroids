@@ -5,11 +5,11 @@ import java.awt.Graphics2D;
 public class ColliderSpriteGameObject implements GameObject {
 
 	private Transform transform;
-	private Collider collider;
+	private PolygonCollider collider;
 	private ColliderSprite sprite;
 	protected boolean alive;
 	
-	public ColliderSpriteGameObject(Transform transform, Collider collider, ColliderSprite sprite) {
+	public ColliderSpriteGameObject(Transform transform, PolygonCollider collider, ColliderSprite sprite) {
 		this.transform = transform;
 		this.collider = collider;
 		this.sprite = sprite;
@@ -29,7 +29,7 @@ public class ColliderSpriteGameObject implements GameObject {
 	}
 
 	public void update(){
-		transform.move();
+		transform.update();
 		collider.update();
 	}
 

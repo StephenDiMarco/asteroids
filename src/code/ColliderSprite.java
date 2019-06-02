@@ -5,10 +5,10 @@ import java.awt.Graphics2D;
 
 public class ColliderSprite {
 	
-	private Collider collider;
+	private PolygonCollider collider;
 	private Color color;
 
-	public ColliderSprite(Collider collider, Color color) {
+	public ColliderSprite(PolygonCollider collider, Color color) {
 		this.collider = collider; 
 		this.color = color;
 	}

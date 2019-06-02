@@ -3,7 +3,7 @@ package code;
 import java.awt.geom.Path2D;
 import java.util.function.Consumer;
 
-public class Collider {
+public class PolygonCollider {
 
 	private Transform transform;
     private Point[] shape;
@@ -11,7 +11,7 @@ public class Collider {
     private double area; 
     private Consumer<ColliderSpriteGameObject> callback;
     
-	public Collider(Transform transform, Point[] inShape) {
+	public PolygonCollider(Transform transform, Point[] inShape) {
 		this.transform = transform;
 		this.shape = inShape;
 		init();
@@ -108,7 +108,7 @@ public class Collider {
         return intersect(tempPoints);
     }
     
-    public boolean intersect(Collider collider) {
+    public boolean intersect(PolygonCollider collider) {
         Point[] tempPoints = collider.getBoundingBox();
         return intersect(tempPoints);
     }

@@ -8,6 +8,7 @@ import java.util.Iterator;
 public class GameObjectRegistry {
 	
 	private HashMap<Layers, ArrayList<ColliderSpriteGameObject>> gameObjects;
+	private HashMap<Layers, ArrayList<ColliderSpriteGameObject>> gameObjectsToRemove;
 	
 	public enum Layers {
 	  PASSIVE_HOSTILE,    // Asteroids
@@ -20,9 +21,11 @@ public class GameObjectRegistry {
 	
 	public GameObjectRegistry() {
 		gameObjects = new HashMap<Layers, ArrayList<ColliderSpriteGameObject>>();
+		gameObjectsToRemove = new HashMap<Layers, ArrayList<ColliderSpriteGameObject>>();
 		initializeCollisionMap();
 		for (Layers layer : Layers.values()) { 
 			gameObjects.put(layer, new ArrayList<ColliderSpriteGameObject>()); 
+			gameObjectsToRemove.put(layer, new ArrayList<ColliderSpriteGameObject>()); 
 		}
 	}
 	
@@ -71,15 +74,33 @@ public class GameObjectRegistry {
 	}
 	
 	public void clean() {
-		for (ArrayList<ColliderSpriteGameObject> gameObjectLayer : gameObjects.values()) {
-			Iterator<ColliderSpriteGameObject> objects = gameObjectLayer.iterator();
+		populateGameObjectsToRemove();
+		removeGameObjects();
+	}
+
+	private void populateGameObjectsToRemove() {	
+		for (HashMap.Entry<Layers,ArrayList<ColliderSpriteGameObject>> entry : gameObjects.entrySet()) {
+			Iterator<ColliderSpriteGameObject> objects = entry.getValue().iterator();
+			Layers layer = entry.getKey();
 			while(objects.hasNext()){
 				ColliderSpriteGameObject object = objects.next();
 				if(!object.isAlive()) {
-					object.onDeath();
-					objects.remove();
+					gameObjectsToRemove.get(layer).add(object);
 				}
 			}
+		}
+	}
+
+	private void removeGameObjects() {
+		for (HashMap.Entry<Layers,ArrayList<ColliderSpriteGameObject>> entry : gameObjectsToRemove.entrySet()) {
+			Iterator<ColliderSpriteGameObject> objects = entry.getValue().iterator();
+			Layers layer = entry.getKey();
+			while(objects.hasNext()){
+				ColliderSpriteGameObject object = objects.next();
+				object.onDeath();
+				gameObjects.get(entry.getKey()).remove(object);
+			}
+			gameObjectsToRemove.get(layer).clear();
 		}
 	}
 	

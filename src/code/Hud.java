@@ -39,15 +39,22 @@ public class Hud {
 	
 	private ArrayList <ScoreOverlay> scoreOverlays;
 
-	public Hud(int width, int height, Ship ship) {
+	public Hud(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.score = 0;
-		this.ship = ship;
 		this.scoreOverlays = new ArrayList <ScoreOverlay>();
 		this.pause = false;
 		this.gameOver = false;
 		this.lastTimeStamp = System.currentTimeMillis();
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
 	}
 	
 	public void updateOverlayMessage(String message) {
@@ -162,4 +169,8 @@ public class Hud {
     		}
     	}
     }
+
+	public void setShip(Ship ship) {
+        this.ship = ship;		
+	}
 }

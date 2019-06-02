@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import code.GameObjectRegistry.Layers;
-
 import java.awt.image.BufferedImage;
 
 
@@ -44,8 +43,6 @@ public class Asteroids extends Game {
     //Server Connection
     @SuppressWarnings("unused")
     private ServerConnection serverConnection;
-    //Custom Colors
-    private Color brown = new Color(139, 75, 60);
     
 	public static void main(String[] args)
 	{
@@ -66,15 +63,17 @@ public class Asteroids extends Game {
         SCREEN_WIDTH = (int)screenSize.getWidth();
         SCREEN_HEIGHT = (int)screenSize.getHeight();
         setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-
+        hud = new Hud(SCREEN_WIDTH, SCREEN_HEIGHT);
+        
         //Sound
         this.audioManager = new AudioManager();
 
         //Creating factories
+        this.gameObjectRegistry = new GameObjectRegistry();
         this.gsonUtility = new GsonUtility();
-        this.asteroidFactory = new AsteroidFactory(audioManager);
-        this.shipFactory = new ShipFactory(gsonUtility, audioManager);
         this.upgradeFactory = new UpgradeFactory(gsonUtility);
+        this.asteroidFactory = new AsteroidFactory(audioManager, gameObjectRegistry, hud, upgradeFactory);
+        this.shipFactory = new ShipFactory(gsonUtility, audioManager);
         this.debrisFactory = new DebrisFactory(audioManager);
         
         newGame();
@@ -87,7 +86,6 @@ public class Asteroids extends Game {
         this.level = 0;
  
         //Creating scene object stores
-        gameObjectRegistry = new GameObjectRegistry();
         asteroids = new ArrayList < Asteroid > ();
         playerBullets = new ArrayList < Bullet > ();
         this.ship = shipFactory.createPlayerShip(new Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), playerBullets);
@@ -97,7 +95,7 @@ public class Asteroids extends Game {
         ships = new ArrayList < Ship > ();
         upgrades = new ArrayList < Upgrades > ();
         stars = new Star[NUM_STARS];
-        hud = new Hud(SCREEN_WIDTH, SCREEN_HEIGHT, ship);
+        hud.setShip(ship);
         hud.setPause(false);
         newLevel();
     }
@@ -123,8 +121,6 @@ public class Asteroids extends Game {
             gameObjectRegistry.paint(brush);
             hud.update(brush);
 
-            //Collision detection
-            collisionCheck();
             //Checking Status - level completion, game over
             gameStatus();
 
@@ -148,75 +144,18 @@ public class Asteroids extends Game {
 
 
     /****************************************     Collision Detection     *****************************************************/
-    //Checks objects for collisions or out of bounds
-    private void collisionCheck() {
-        isOutOfBounds(ship);
-        //Checking if the ship has hit any upgrades
-        if (!upgrades.isEmpty()) {
-            for (int index = 0; index < upgrades.size(); index++) {
-                if (ship.intersect(upgrades.get(index))) {
-                    ship.upgrade(upgrades.get(index).getAttributeType(), upgrades.get(index).getModifier());
-                    hud.updateOverlayMessage(upgrades.get(index).getName(), hud.UPGRADE_OVERLAY_TIME);
-                    hud.updateScore(upgrades.get(index).getScore(), upgrades.get(index).position);
-                    upgrades.remove(index);
-                }            
-            } 
-        }
+    
+    public static void isOutOfBounds(Point position) {
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-        //Checking if bullets are out of bounds or are depleted.
-        for (int i = playerBullets.size() - 1; i >= 0; i--) {
-            //Checking if shot is depleted or out of bounds
-            if (playerBullets.get(i).depleted) {
-                playerBullets.remove(i);
-            } else {
-                isOutOfBounds(playerBullets.get(i));
-            }
-        }
-
-        //Checking enemy bullets for depletion or collision
-        for (int i = aiBullets.size() - 1; i >= 0; i--) {
-            //Checking if shot is depleted or out of bounds
-            if (aiBullets.get(i).depleted) {
-                aiBullets.remove(i);
-                //Checking player ship for collision
-            } else if (ship.contains(aiBullets.get(i).position)) {
-                //Checking for overshields, then hitting ship and checking for death
-                if (!ship.hasOvershields()) {
-                    if (ship.hit(aiBullets.get(i).getStrength()) < 0) {
-                        killPlayer();
-                    }
-                }
-                aiBullets.remove(i);
-            } else {
-                isOutOfBounds(aiBullets.get(i));
-            }
-
-        }
-
-        //AI Ship Collision Check
-        for (int i = 0; i < ships.size(); i++) {
-            isOutOfBounds(ships.get(i));
-            //Checking the players bullets have hit the aiShips
-            for (int j = 0; j < playerBullets.size(); j++) {
-                //Checking for collision
-                if (ships.get(i).contains(playerBullets.get(j).position)) {
-                    destroyShip(i);
-                    break;
-                }
-            }
-        }
-    }
-
-    //Checks objects for collisions or out of bounds
-    private void isOutOfBounds(Shape shape) {
-        if (shape.position.x > SCREEN_WIDTH) {
-            shape.position.x = 0;
-        } else if (shape.position.x < 0) {
-            shape.position.x = SCREEN_WIDTH;
-        } else if (shape.position.y > SCREEN_HEIGHT) {
-            shape.position.y = 0;
-        } else if (shape.position.y < 0) {
-            shape.position.y = SCREEN_HEIGHT;
+        if (position.x > screenSize.getWidth()) {
+            position.x = 0;
+        } else if (position.x < 0) {
+            position.x = screenSize.getWidth();
+        } else if (position.y > screenSize.getHeight()) {
+            position.y = 0;
+        } else if (position.y < 0) {
+            position.y = screenSize.getHeight();
         }
     }
     /****************************************     Update Methods     *****************************************************/
@@ -259,15 +198,6 @@ public class Asteroids extends Game {
     }
 
     private void updateShip(Graphics2D brush) {
-        //Updating then drawing ship
-        ship.update();
-        brush.setColor(Color.red);
-        brush.fill(ship.getBoundingBoxPath());
-        //Adding overshield
-        if (ship.hasOvershields()) {
-            brush.setColor(Color.white);
-            brush.draw(ship.getBoundingBoxPath());
-        }
         //Updating bullets
         brush.setColor(Color.green);
         //Painting bullets
@@ -278,11 +208,6 @@ public class Asteroids extends Game {
     }
 
     private void updateAIShip(Graphics2D brush) {
-        brush.setColor(Color.magenta);
-        for (int i = 0; i < ships.size(); i++) {
-            ships.get(i).update();
-            brush.fill(ships.get(i).getBoundingBoxPath());
-        }
         //Painting aiBullets
         for (int j = 0; j < aiBullets.size(); j++) {
             aiBullets.get(j).move();
@@ -301,8 +226,8 @@ public class Asteroids extends Game {
             x = 0 + (int) Math.round(SCREEN_WIDTH * Math.random());
             y = 0 + (int) Math.round(SCREEN_HEIGHT * Math.random());
             //Checking distance from player
-            deltaX = x - ship.position.x;
-            deltaY = y - ship.position.y;
+            deltaX = x - ship.getTransform().getPosition().x;
+            deltaY = y - ship.getTransform().getPosition().y;
             distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
             if (distance > MIN_DISTANCE) {
                 safe = true;
@@ -316,11 +241,11 @@ public class Asteroids extends Game {
     static protected int SHIP_DROP_CHANCE = 2;
 
     private void destroyShip(int index) {
-    	hud.updateScore(ships.get(index).score(), ships.get(index).position);
+    	hud.updateScore(ships.get(index).score(), ships.get(index).getTransform().getPosition());
 
         //Chance item drop
         if (SHIP_DROP_CHANCE * Math.random() > SHIP_DROP_CHANCE - 1) {
-        	addUpgradeToScene(ships.get(index).position);
+        	addUpgradeToScene(ships.get(index).getTransform().getPosition());
         }
         audioManager.playOnce(audioManager.SHIP_DESTROYED);
         ships.remove(index);
@@ -355,10 +280,10 @@ public class Asteroids extends Game {
     //resets Player's location to center of screen
     private void resetPlayer() {
         //Resetting Ship
-        ship.position.x = SCREEN_WIDTH / 2;
-        ship.position.y = SCREEN_HEIGHT / 2;
-        ship.rotation = 0;
-        ship.setVelocity(0, 0);
+        ship.getTransform().getPosition().x = SCREEN_WIDTH / 2;
+        ship.getTransform().getPosition().y = SCREEN_HEIGHT / 2;
+        ship.getTransform().setRotation(0);
+        ship.getTransform().setVelocity(0, 0);
     }
 
     //New level Start Up
@@ -413,7 +338,7 @@ public class Asteroids extends Game {
 	
 	public void createAsteroids(int numAsteroids, int level) {
         for (int i = 0; i < numAsteroids; i++) {
-        	gameObjectRegistry.register(asteroidFactory.createAsteroid(findLocation(), level), Layers.PASSIVE_HOSTILE);
+        	asteroidFactory.createAsteroid(findLocation(), level);
         }
 	}
 	

@@ -1,20 +1,25 @@
 package code;
 
-import java.awt.Color;
 import java.util.function.Consumer;
 
 public class Asteroid extends ColliderSpriteGameObject {
 
 	private AudioManager audioManager;
+	private Hud hud;
+	private AsteroidFactory asteroidFactory;
+	private UpgradeFactory upgradeFactory;
 
 	private float health;
 	private int level;
 	
-	public Asteroid(Transform transform, Collider collider, ColliderSprite sprite, AudioManager audioManager, int level) {
+	public Asteroid(Transform transform, PolygonCollider collider, ColliderSprite sprite, AudioManager audioManager, int level, Hud hud, AsteroidFactory asteroidFactory, UpgradeFactory upgradeFactory) {
 		super(transform, collider, sprite);
 	    Consumer<ColliderSpriteGameObject> onCollision = (ColliderSpriteGameObject t) -> this.onCollision(t);
 		collider.setCallback(onCollision);
 		this.audioManager = audioManager;
+		this.hud = hud;
+		this.asteroidFactory = asteroidFactory;
+		this.upgradeFactory = upgradeFactory;
 
 		//Setting health dependent on level
 		this.level = level;
@@ -34,16 +39,16 @@ public class Asteroid extends ColliderSpriteGameObject {
 	public void onDeath() {
 		audioManager.playOnce(audioManager.ASTEROID_DESTROYED);    
 
-	//	hud.updateScore(ASTEROID_BASE_SCORE * asteroids.get(index).getLevel(), asteroids.get(index).position);
+		hud.updateScore(ASTEROID_BASE_SCORE * level, getTransform().getPosition());
         
-    //    //Breaking asteroid down into new asteroids
-    //    if (asteroids.get(index).getLevel() >= 2) {
-    //        asteroids.addAll(asteroidFactory.splitAsteroid(asteroids.get(index)));
-    //    } else {
-    //        if (Math.random() <= ASTEROID_DROP_CHANCE) {
-    //        	addUpgradeToScene(asteroids.get(index).position);
-    //        }
-    //    }
+        //Breaking asteroid down into new asteroids
+        if (level >= 2) {
+            asteroidFactory.splitAsteroid(this);
+        } else {
+           if (Math.random() <= ASTEROID_DROP_CHANCE) {
+            	upgradeFactory.createRandomUpgrade(getTransform().getPosition());
+            }
+       }
 	}
 	
 	public int getLevel(){

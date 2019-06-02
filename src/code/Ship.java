@@ -1,27 +1,21 @@
 package code;
 import java.util.ArrayList;
 
-public class Ship extends Polygon {
+public class Ship extends ColliderSpriteGameObject {
     private Controller controller;
 	//Weapon attributes, all accessible fields
 	protected ArrayList<Bullet> bullets;         //Will be used for AIs fire as well
     private ShipAttributes attributes;
 	public int lives;
 
-    //Position information
-	private double xVelocity;
-	private double yVelocity;
-	protected double timeInterval;
-	
 	//Sounds
 	private AudioManager audioManager;
 	private String weaponSound;
 	
 	/************************************** Constructors ****************************************/
-	public Ship(Point[] inShape, Point inPosition,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes, AudioManager audioManager, String weaponSound){
-		super(inShape, inPosition, 0);
+	public Ship(Transform transform, PolygonCollider collider, ColliderSprite sprite,  ArrayList<Bullet> bullets, Controller controller, ShipAttributes attributes, AudioManager audioManager, String weaponSound){
+		super(transform, collider, sprite);
 		//Setting time interval
-		timeInterval = Game.GetTimeInterval();
 		this.bullets = bullets;
 		this.controller = controller;
 		this.attributes = attributes;
@@ -41,12 +35,9 @@ public class Ship extends Polygon {
 	public double getMaxShield(){return attributes.MAX_SHIELDS;}
 
 	//Velocity Getters
-	public double getVelocity(){	return Math.sqrt(xVelocity*xVelocity+yVelocity*yVelocity);}
 	public double getAcceleration() {return attributes.ACCELERATION;}
 	public void setAcceleration(double value) { attributes.ACCELERATION = value;}
 	public double getMaxAcceleration() {return attributes.MAX_ACCELERATION;}
-	public double getXVel(){	return xVelocity;}
-	public double getYVel(){	return yVelocity;}
 	
 	public Controller getController() { return controller; }
 	
@@ -58,7 +49,7 @@ public class Ship extends Polygon {
 	 public void update(){
 		 controller.update();
 		 
-		 move();
+		 getTransform().update();
 		 recharge();
 		 //Checking overshield
 		 if(attributes.OVERSHIELDS){
@@ -70,13 +61,13 @@ public class Ship extends Polygon {
 			 
 		 //Checking Rotation
 		 if(controller.isKeyRotateCW() && !controller.isKeyRotateCCW()){
-			 rotate(attributes.ANGULAR_VELOCITY);
+			 getTransform().rotate(attributes.ANGULAR_VELOCITY);
 		 }else if(!controller.isKeyRotateCW() && controller.isKeyRotateCCW()){
-			 rotate(-attributes.ANGULAR_VELOCITY);
+			 getTransform().rotate(-attributes.ANGULAR_VELOCITY);
 		 }
 		 //Checking Thrusters (Acceleration)
 		 if(controller.isKeyAccelerate()){
-			accelerate(attributes.ACCELERATION);
+			getTransform().accelerate(attributes.ACCELERATION, attributes.MAX_VELOCITY);
 		 }
 		//Checking Stabilizers 
 		 if(controller.isKeyStabilize()){
@@ -106,30 +97,8 @@ public class Ship extends Polygon {
 		 attributes.OVERSHIELDS = true;
 		 attributes.OVERSHIELDS_DURATION = 200;
 	 }
+
 	 /************************ Engine System Methods **************************/
-	public void setVelocity(double xVelocity, double yVelocity){ 	 
-		this.xVelocity = xVelocity;
-		this.yVelocity = yVelocity;
-	}
-
-	 private void move(){
-		 position.x += xVelocity*timeInterval;
-		 position.y += yVelocity*timeInterval;
-	 }
-
-	 private void accelerate (double acceleration) {
-		 double dvx = (acceleration * Math.sin(Math.toRadians(rotation)));
-		 double dvy = (acceleration * -Math.cos(Math.toRadians(rotation)));
-		 xVelocity += dvx;
-		 yVelocity += dvy;
-		 if(getVelocity() > attributes.MAX_VELOCITY ) {
-			 double theta = -Math.atan2(xVelocity, yVelocity);
-			 theta += Math.PI;
-			 theta = Math.toDegrees(theta);
-			 xVelocity = (attributes.MAX_VELOCITY * Math.sin(Math.toRadians(theta)));
-			 yVelocity = (attributes.MAX_VELOCITY * -Math.cos(Math.toRadians(theta)));
-		 }
-	 }
 
 	 private void stabilize(){
 		 xVelocity *= attributes.STABILIZE_COEFF;
@@ -140,15 +109,11 @@ public class Ship extends Polygon {
 		 }
 	 }
 
-	 protected void rotate(double angularVelocity){
-		 super.rotate(angularVelocity*timeInterval);
-	 }
-
 	 /********************************* Weapon Methods *********************************/
 	 private void fire(){
 		if(attributes.CHARGE > 0){
 			audioManager.playOnce(weaponSound);
-			bullets.add( new Bullet(position.x, position.y, (int)Math.round(attributes.STRENGTH), attributes.STRENGTH, timeInterval, rotation, attributes.BULLET_RANGE, getXVel(), getYVel()));
+			bullets.add( new Bullet(getTranmform(), (int)Math.round(attributes.STRENGTH), attributes.STRENGTH, attributes.BULLET_RANGE);
 			//Decrementing the charge	
 			attributes.CHARGE--;
 			//Adding delay to next shot

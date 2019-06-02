@@ -3,6 +3,8 @@ package code;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import code.GameObjectRegistry.Layers;
+
 public class AsteroidFactory {
 	
     private int BASE_RADIUS = 200;
@@ -14,14 +16,20 @@ public class AsteroidFactory {
 
     private Pallet browns;
 	private AudioManager audioManager;
+	private GameObjectRegistry gameObjectRegistry;
+	private Hud hud;
+	private UpgradeFactory upgradeFactory;
 	
-	public AsteroidFactory(AudioManager audioManager) {
-		this.audioManager = audioManager;
+	public AsteroidFactory(AudioManager audioManager, GameObjectRegistry gameObjectRegistry, Hud hud, UpgradeFactory upgradeFactory) {
 		browns = new Pallet(new Color(139, 75, 60));
+		this.audioManager = audioManager;
+		this.gameObjectRegistry = gameObjectRegistry;
+		this.hud = hud;
+		this.upgradeFactory = upgradeFactory;
 	}
 
     
-    public  ArrayList <Asteroid> splitAsteroid(Asteroid asteroid) {
+    public void splitAsteroid(Asteroid asteroid) {
     	// Decrementing the asteroid level
         int level =  asteroid.getLevel() - 1;
 
@@ -38,16 +46,15 @@ public class AsteroidFactory {
         
         for (int i = 0; i < numberOfAsteroids; i++) {
         	Point inPosition = new Point(position.x + 10 * level * Math.random(), position.y + 10 * level * Math.random());
-        	asteroids.add(createAsteroid(inPosition, level, color));
+        	createAsteroid(inPosition, level, color);
         }
-        return asteroids;
     }
     
-    public Asteroid createAsteroid(Point inPosition, int level) {
-    	return createAsteroid(inPosition, level, browns.getRandomColor());
+    public void createAsteroid(Point inPosition, int level) {
+    	createAsteroid(inPosition, level, browns.getRandomColor());
     }
     
-    private Asteroid createAsteroid(Point inPosition, int level, Color color) {
+    private void createAsteroid(Point inPosition, int level, Color color) {
         int points = (int)(MIN_POINTS + level + Math.floor(RANDOM_POINTS * Math.random()));
         Point[] shape = new Point[points];
         
@@ -67,9 +74,9 @@ public class AsteroidFactory {
 		//Randomly setting velocity, as a function of the square of the asteroids level
 		double sqrdLevel = Math.sqrt(level);		
 		Transform transform = new Transform(inPosition, sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()),sqrdLevel*0.1-(sqrdLevel*0.2*Math.random()));
-		Collider collider = new Collider(transform, shape);
+		PolygonCollider collider = new PolygonCollider(transform, shape);
 		ColliderSprite sprite = new ColliderSprite(collider, browns.getRandomColor());
 		
-        return new Asteroid(transform, collider, sprite, audioManager, level);
+		gameObjectRegistry.register(new Asteroid(transform, collider, sprite, audioManager, level, hud, this, upgradeFactory), Layers.PASSIVE_HOSTILE);
     }
 }
